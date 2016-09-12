@@ -12,8 +12,6 @@
 #import "FYFontDownloader.h"
 #import "FYFontModel.h"
 
-const NSInteger FYUsingSystemFontIndex = NSIntegerMin;
-
 @interface FYFontManager ()
 
 @property (nonatomic, strong) FYFontCache *fontCache;
@@ -44,13 +42,18 @@ const NSInteger FYUsingSystemFontIndex = NSIntegerMin;
         _fontCache = [FYFontCache sharedFontCache];
         _fontDownloader = [FYFontDownloader sharedDownloader];
         _fontRegister = [FYFontRegister sharedRegister];
-        _mainFontIndex = FYUsingSystemFontIndex;
+        _mainFontIndex = 0;
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(changeModelStatus:)
                                                      name:FYNewFontDownloadNotification
                                                    object:_fontDownloader];
     }
     return self;
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 #pragma mark - Public
@@ -146,6 +149,12 @@ const NSInteger FYUsingSystemFontIndex = NSIntegerMin;
     _fontURLStringArray = fontURLStringArray;
     
     NSMutableArray *fontModelArray = [NSMutableArray array];
+    
+    // stand for system default font
+    [fontModelArray addObject:[FYFontModel modelWithURL:nil
+                                                 status:FYFontModelDownloadStatusDownloaded
+                                       downloadProgress:0.0f]];
+    
     [fontURLStringArray enumerateObjectsUsingBlock:^(NSString * _Nonnull URLString, NSUInteger idx, BOOL * _Nonnull stop) {
         if ([URLString isKindOfClass:[NSString class]]) {
             NSURL *URL = [NSURL URLWithString:URLString];

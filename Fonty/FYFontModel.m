@@ -10,6 +10,15 @@
 
 @implementation FYFontModel
 
+- (NSString *)description
+{
+    if (self.URL) {
+        return self.URL.absoluteString;
+    } else {
+        return @"system default font";
+    }
+}
+
 + (instancetype)modelWithURL:(NSURL *)URL
                       status:(FYFontModelDownloadStatus)status
             downloadProgress:(float)downloadProgress {

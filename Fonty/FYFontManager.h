@@ -11,8 +11,6 @@
 
 @class FYFontModel;
 
-extern const NSInteger FYUsingSystemFontIndex;
-
 @interface FYFontManager : NSObject
 
 + (instancetype)sharedManager;
