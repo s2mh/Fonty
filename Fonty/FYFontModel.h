@@ -12,6 +12,7 @@
 typedef NS_ENUM(NSUInteger, FYFontModelDownloadStatus) {
     FYFontModelDownloadStatusToBeDownloaded,
     FYFontModelDownloadStatusDownloading,
+    FYFontModelDownloadStatusSuspending,
     FYFontModelDownloadStatusDownloaded,
     FYFontModelDownloadStatusDeleting
 };
@@ -20,11 +21,11 @@ typedef NS_ENUM(NSUInteger, FYFontModelDownloadStatus) {
 
 @property (nonatomic, copy) NSURL *URL;
 @property (nonatomic, assign) FYFontModelDownloadStatus status;
-@property (nonatomic, assign) float downloadProgress;
+@property (nonatomic, assign) double downloadProgress;
 @property (nonatomic, copy) NSString *postScriptName;
 
 + (instancetype)modelWithURL:(NSURL *)URL
                       status:(FYFontModelDownloadStatus)status
-            downloadProgress:(float)downloadProgress;
+            downloadProgress:(double)downloadProgress;
 
 @end

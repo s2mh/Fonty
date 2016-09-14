@@ -13,6 +13,9 @@
 #import "FYFontCache.h"
 #import "FYFontDownloader.h"
 #import "FYFontRegister.h"
+
 #import "FYFontModel.h"
+
+#import "FYConst.h"
 
 #endif /* FYHeader_h */

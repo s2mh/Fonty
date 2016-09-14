@@ -28,12 +28,26 @@
     if (fontRef) {
         CTFontManagerRegisterGraphicsFont(fontRef, NULL);
         postScriptName = CFBridgingRelease(CGFontCopyPostScriptName(fontRef));
-        if (completeBlock) {
+        if (postScriptName && completeBlock) {
             completeBlock(postScriptName);
         }
     }
     CGFontRelease(fontRef);
     return postScriptName;
+}
+
+- (void)unregisterFontWithPath:(NSString *)path completeBlock:(void(^)())completeBlock {
+    NSURL *fontUrl = [NSURL fileURLWithPath:path];
+    CGDataProviderRef fontDataProvider = CGDataProviderCreateWithURL((__bridge CFURLRef)fontUrl);
+    CGFontRef fontRef = CGFontCreateWithDataProvider(fontDataProvider);
+    if (fontRef) {
+        CTFontManagerUnregisterGraphicsFont(fontRef, NULL);
+    }
+    CGFontRelease(fontRef);
+    if (completeBlock) {
+        NSLog(@"completeBlock");
+        completeBlock();
+    }
 }
 
 @end

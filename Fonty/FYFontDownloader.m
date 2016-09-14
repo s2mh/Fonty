@@ -9,13 +9,12 @@
 #import "FYFontDownloader.h"
 #import "FYFontCache.h"
 #import "FYFontModel.h"
-
-NSString *const FYNewFontDownloadNotification = @"FYNewFontDownloadNotification";
-NSString *const FYNewFontDownloadNotificationKey = @"FYNewFontDownloadNotificationKey"; // FYDowloadFontModel
+#import "FYConst.h"
 
 @interface FYFontDownloader () <NSURLSessionDownloadDelegate>
 
 @property (nonatomic, strong) NSURLSession *session;
+@property (nonatomic, strong) NSMutableDictionary<NSURL *, NSURLSessionDownloadTask *> *taskDictionary; // key:
 
 @end
 
@@ -31,19 +30,40 @@ NSString *const FYNewFontDownloadNotificationKey = @"FYNewFontDownloadNotificati
 }
 
 - (void)downloadFontWithURL:(NSURL *)URL {
-    NSURLSessionDownloadTask *task = [self.session downloadTaskWithURL:URL];
+    
+    NSURLSessionDownloadTask *task = [self.taskDictionary objectForKey:URL];
+    if (!task) {
+        task = [self.session downloadTaskWithURL:URL];
+        [self.taskDictionary setObject:task forKey:URL];
+    }
     [task resume];
+}
+
+- (void)suspendDownloadWithURL:(NSURL *)URL {
+    
+    NSURLSessionDownloadTask *task = [self.taskDictionary objectForKey:URL];
+    if (task) {
+        [task suspend];
+        FYFontModel *model = [FYFontModel modelWithURL:URL
+                                                status:FYFontModelDownloadStatusSuspending
+                                      downloadProgress:((double)task.countOfBytesReceived / task.countOfBytesExpectedToReceive)];
+        NSDictionary *userInfo = @{FYNewFontDownloadNotificationKey:model};
+        [[NSNotificationCenter defaultCenter] postNotificationName:FYNewFontDownloadNotification object:self userInfo:userInfo];
+    }
 }
 
 #pragma mark - NSURLSessionDownloadDelegate
 
-- (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location {
+- (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask
+                              didFinishDownloadingToURL:(NSURL *)location {
+    
     NSString *path = [[FYFontCache sharedFontCache] cacheFileAtLocolURL:location fromWebURL:downloadTask.originalRequest.URL];
+    [self.taskDictionary removeObjectForKey:downloadTask.originalRequest.URL];
     if (path) {
         dispatch_async(dispatch_get_main_queue(), ^{
             FYFontModel *model = [FYFontModel modelWithURL:downloadTask.originalRequest.URL
-                                                                  status:FYFontModelDownloadStatusDownloaded
-                                                        downloadProgress:1.0f];
+                                                    status:FYFontModelDownloadStatusDownloaded
+                                          downloadProgress:1.0f];
             NSDictionary *userInfo = @{FYNewFontDownloadNotificationKey:model};
             [[NSNotificationCenter defaultCenter] postNotificationName:FYNewFontDownloadNotification object:self userInfo:userInfo];
         });
@@ -51,19 +71,38 @@ NSString *const FYNewFontDownloadNotificationKey = @"FYNewFontDownloadNotificati
 }
 
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask
-      didWriteData:(int64_t)bytesWritten
- totalBytesWritten:(int64_t)totalBytesWritten
-totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite {
-    NSLog(@"%f", ((float)totalBytesWritten / totalBytesExpectedToWrite));
+                                           didWriteData:(int64_t)bytesWritten
+                                      totalBytesWritten:(int64_t)totalBytesWritten
+                              totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite {
+    
+    NSLog(@"totalBytesExpectedToWrite %lld", totalBytesExpectedToWrite);
+    NSLog(@"%f", ((double)totalBytesWritten / totalBytesExpectedToWrite));
     if (totalBytesExpectedToWrite != NSURLSessionTransferSizeUnknown) {
         dispatch_async(dispatch_get_main_queue(), ^{
             FYFontModel *model = [FYFontModel modelWithURL:downloadTask.originalRequest.URL
                                                                   status:FYFontModelDownloadStatusDownloading
-                                                        downloadProgress:(float)totalBytesWritten / totalBytesExpectedToWrite];
+                                                        downloadProgress:(double)totalBytesWritten / totalBytesExpectedToWrite];
             NSDictionary *userInfo = @{FYNewFontDownloadNotificationKey:model};
             [[NSNotificationCenter defaultCenter] postNotificationName:FYNewFontDownloadNotification object:self userInfo:userInfo];
         });
     }
+}
+
+- (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask
+                                      didResumeAtOffset:(int64_t)fileOffset
+                                     expectedTotalBytes:(int64_t)expectedTotalBytes {
+    
+    NSLog(@"expectedTotalBytes %lld", expectedTotalBytes);
+    
+//    if (expectedTotalBytes != NSURLSessionTransferSizeUnknown) {
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            FYFontModel *model = [FYFontModel modelWithURL:downloadTask.originalRequest.URL
+//                                                    status:FYFontModelDownloadStatusDownloading
+//                                          downloadProgress:(double)totalBytesWritten / expectedTotalBytes];
+//            NSDictionary *userInfo = @{FYNewFontDownloadNotificationKey:model};
+//            [[NSNotificationCenter defaultCenter] postNotificationName:FYNewFontDownloadNotification object:self userInfo:userInfo];
+//        });
+//    }
 }
 
 #pragma mark - accessor
@@ -75,6 +114,13 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite {
                                             delegateQueue:nil];
     }
     return _session;
+}
+
+- (NSMutableDictionary *)taskDictionary {
+    if (!_taskDictionary) {
+        _taskDictionary = [NSMutableDictionary dictionary];
+    }
+    return _taskDictionary;
 }
 
 @end

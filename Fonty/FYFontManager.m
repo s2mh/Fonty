@@ -11,6 +11,9 @@
 #import "FYFontRegister.h"
 #import "FYFontDownloader.h"
 #import "FYFontModel.h"
+#import "FYConst.h"
+
+static NSString *const FYMainFontIndexKey = @"FYMainFontIndexKey";
 
 @interface FYFontManager ()
 
@@ -42,11 +45,11 @@
         _fontCache = [FYFontCache sharedFontCache];
         _fontDownloader = [FYFontDownloader sharedDownloader];
         _fontRegister = [FYFontRegister sharedRegister];
-        _mainFontIndex = 0;
+        _mainFontIndex = [[[NSUserDefaults standardUserDefaults] objectForKey:FYMainFontIndexKey] integerValue];
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(changeModelStatus:)
                                                      name:FYNewFontDownloadNotification
-                                                   object:_fontDownloader];
+                                                   object:nil];
     }
     return self;
 }
@@ -114,30 +117,44 @@
     [self downloadFontWithURL:[NSURL URLWithString:URLString]];
 }
 
-- (void)deleteFontWithURL:(NSURL *)URL completeBlock:(void(^)())completeBlock {
+- (void)deleteFontWithURL:(NSURL *)URL {
     if ([URL isKindOfClass:[NSURL class]]) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            [self.fontCache cleanCachedFileWithWebURL:URL];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (completeBlock) {
-                    completeBlock();
-                }
-            });
+            NSString *cachePath = [self.fontCache cachedFilePathWithWebURL:URL];
+            [self.fontRegister unregisterFontWithPath:cachePath completeBlock:^{
+                [self.fontCache cleanCachedFileWithWebURL:URL];
+            }];
         });
     }
 }
 
-- (void)deleteFontWithURLString:(NSString *)URLString completeBlock:(void(^)())completeBlock {
-    [self deleteFontWithURL:[NSURL URLWithString:URLString] completeBlock:completeBlock];
+- (void)deleteFontWithURLString:(NSString *)URLString {
+    [self deleteFontWithURL:[NSURL URLWithString:URLString]];
+}
+
+- (void)pauseDownloadingWithURL:(NSURL *)URL {
+    if ([URL isKindOfClass:[NSURL class]]) {
+        [self.fontDownloader suspendDownloadWithURL:URL];
+    }
+}
+- (void)pauseDownloadingWithURLString:(NSString *)URLString {
+    [self pauseDownloadingWithURL:[NSURL URLWithString:URLString]];
 }
 
 #pragma mark - Notification
 
-- (void)changeModelStatus:(NSNotification *)notif {
-    FYFontModel *downloadedModel = [notif.userInfo objectForKey:FYNewFontDownloadNotificationKey];
+- (void)changeModelStatus:(NSNotification *)NSNotification {
+    FYFontModel *downloadedModel = [NSNotification.userInfo objectForKey:FYNewFontDownloadNotificationKey];
     for (FYFontModel *model in self.fontModelArray) {
         if ([model.URL isEqual:downloadedModel.URL]) {
-            model.status = FYFontModelDownloadStatusDownloaded;
+            if (downloadedModel.status == FYFontModelDownloadStatusDownloading && model.downloadProgress > downloadedModel.downloadProgress) {
+                break;
+            }
+            if (downloadedModel.status == FYFontModelDownloadStatusToBeDownloaded) {
+                self.mainFontIndex = 0;
+            }
+            model.status = downloadedModel.status;
+            model.downloadProgress = downloadedModel.downloadProgress;
             break;
         }
     }
@@ -147,13 +164,12 @@
 
 - (void)setFontURLStringArray:(NSArray<NSString *> *)fontURLStringArray {
     _fontURLStringArray = fontURLStringArray;
-    
     NSMutableArray *fontModelArray = [NSMutableArray array];
     
     // stand for system default font
     [fontModelArray addObject:[FYFontModel modelWithURL:nil
                                                  status:FYFontModelDownloadStatusDownloaded
-                                       downloadProgress:0.0f]];
+                                       downloadProgress:1.0f]];
     
     [fontURLStringArray enumerateObjectsUsingBlock:^(NSString * _Nonnull URLString, NSUInteger idx, BOOL * _Nonnull stop) {
         if ([URLString isKindOfClass:[NSString class]]) {
@@ -165,6 +181,7 @@
                 NSString *cachePath = [self.fontCache cachedFilePathWithWebURL:URL];
                 if (cachePath) {
                     model.status = FYFontModelDownloadStatusDownloaded;
+                    model.downloadProgress = 1.0f;
                 }
                 [fontModelArray addObject:model];
             }
@@ -180,5 +197,12 @@
     return _postScriptNames;
 }
 
-@end
+- (void)setMainFontIndex:(NSInteger)mainFontIndex {
+    if (_mainFontIndex != mainFontIndex) {
+        _mainFontIndex = mainFontIndex;
+        [[NSUserDefaults standardUserDefaults] setObject:@(_mainFontIndex) forKey:FYMainFontIndexKey];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+}
 
+@end

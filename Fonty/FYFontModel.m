@@ -21,7 +21,7 @@
 
 + (instancetype)modelWithURL:(NSURL *)URL
                       status:(FYFontModelDownloadStatus)status
-            downloadProgress:(float)downloadProgress {
+            downloadProgress:(double)downloadProgress {
     FYFontModel *model = [[FYFontModel alloc] init];
     model.URL = URL;
     model.status = status;

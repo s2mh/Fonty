@@ -8,13 +8,11 @@
 
 #import <Foundation/Foundation.h>
 
-extern NSString *const FYNewFontDownloadNotification;
-extern NSString *const FYNewFontDownloadNotificationKey;
-
 @interface FYFontDownloader : NSObject
 
 + (instancetype)sharedDownloader;
 
 - (void)downloadFontWithURL:(NSURL *)URL;
+- (void)suspendDownloadWithURL:(NSURL *)URL;
 
 @end

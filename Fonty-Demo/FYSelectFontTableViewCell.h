@@ -10,4 +10,6 @@
 
 @interface FYSelectFontTableViewCell : UITableViewCell
 
+@property (nonatomic, assign) double downloadProgress;
+
 @end

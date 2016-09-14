@@ -8,6 +8,9 @@
 
 #import <CommonCrypto/CommonDigest.h>
 #import "FYFontCache.h"
+#import "FYFontModel.h"
+#import "FYFontDownloader.h"
+#import "FYConst.h"
 
 static NSString * const FTFontCacheDirectoryName = @"FTFont";
 
@@ -65,6 +68,13 @@ static NSString * const FTFontCacheDirectoryName = @"FTFont";
 - (void)cleanCachedFileWithWebURL:(NSURL *)webURL {
     NSString *filePath = [self cachedFilePathForWebURLString:webURL.absoluteString];
     [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        FYFontModel *model = [FYFontModel modelWithURL:webURL
+                                                status:FYFontModelDownloadStatusToBeDownloaded
+                                      downloadProgress:0.0f];
+        NSDictionary *userInfo = @{FYNewFontDownloadNotificationKey:model};
+        [[NSNotificationCenter defaultCenter] postNotificationName:FYNewFontDownloadNotification object:self userInfo:userInfo];
+    });
 }
 
 #pragma mark - Private
