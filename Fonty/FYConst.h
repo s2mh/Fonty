@@ -12,4 +12,6 @@
 extern NSString *const FYNewFontDownloadNotification;
 extern NSString *const FYNewFontDownloadNotificationKey;
 
+//extern const double FYNewFontFileSizeUnkownTag;
+
 #endif /* FYConst_h */

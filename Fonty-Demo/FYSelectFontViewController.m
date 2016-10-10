@@ -26,7 +26,7 @@
     [super viewDidLoad];
     self.navigationItem.title = @"Fonty";
     
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Done"
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Hide"
                                                                               style:UIBarButtonItemStyleDone
                                                                              target:self
                                                                              action:@selector(backAction)];
@@ -64,6 +64,8 @@
     cell.textLabel.font = [UIFont fy_fontWithURL:model.URL size:17.0f];
     
     cell.downloadProgress = model.downloadProgress;
+    cell.striped = model.fileSizeUnknown;
+    cell.stripedPause = (model.status == FYFontModelDownloadStatusSuspending);
     
     if (indexPath.row == self.fontManager.mainFontIndex) {
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
@@ -117,7 +119,9 @@
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
     FYFontModel *model = [self.fontModelArray objectAtIndex:indexPath.row];
-    if (model.status == FYFontModelDownloadStatusDownloaded || model.URL) {
+    if ((model.status == FYFontModelDownloadStatusDownloaded ||
+         model.status == FYFontModelDownloadStatusDownloading ||
+         model.status == FYFontModelDownloadStatusSuspending) && model.URL) {
         return UITableViewCellEditingStyleDelete;
     } else {
         return UITableViewCellEditingStyleNone;

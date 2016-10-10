@@ -69,9 +69,8 @@ static NSString * const FTFontCacheDirectoryName = @"FTFont";
     NSString *filePath = [self cachedFilePathForWebURLString:webURL.absoluteString];
     [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
     dispatch_async(dispatch_get_main_queue(), ^{
-        FYFontModel *model = [FYFontModel modelWithURL:webURL
-                                                status:FYFontModelDownloadStatusToBeDownloaded
-                                      downloadProgress:0.0f];
+        FYFontModel *model = [[FYFontModel alloc] init];
+        model.URL = webURL;
         NSDictionary *userInfo = @{FYNewFontDownloadNotificationKey:model};
         [[NSNotificationCenter defaultCenter] postNotificationName:FYNewFontDownloadNotification object:self userInfo:userInfo];
     });

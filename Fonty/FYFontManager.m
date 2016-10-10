@@ -117,6 +117,16 @@ static NSString *const FYMainFontIndexKey = @"FYMainFontIndexKey";
     [self downloadFontWithURL:[NSURL URLWithString:URLString]];
 }
 
+- (void)cancelDownloadingFontWithURL:(NSURL *)URL {
+    if ([URL isKindOfClass:[NSURL class]]) {
+        [self.fontDownloader cancelDownloadingFontWithURL:URL];
+    }
+}
+
+- (void)cancelDownloadingFontWithURLString:(NSString *)URLString {
+    [self cancelDownloadingFontWithURL:[NSURL URLWithString:URLString]];
+}
+
 - (void)deleteFontWithURL:(NSURL *)URL {
     if ([URL isKindOfClass:[NSURL class]]) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -147,7 +157,7 @@ static NSString *const FYMainFontIndexKey = @"FYMainFontIndexKey";
     FYFontModel *downloadedModel = [NSNotification.userInfo objectForKey:FYNewFontDownloadNotificationKey];
     for (FYFontModel *model in self.fontModelArray) {
         if ([model.URL isEqual:downloadedModel.URL]) {
-            if (downloadedModel.status == FYFontModelDownloadStatusDownloading && model.downloadProgress > downloadedModel.downloadProgress) {
+            if (downloadedModel.status == FYFontModelDownloadStatusDownloading && !model.fileSizeUnknown && model.downloadProgress > downloadedModel.downloadProgress) {
                 break;
             }
             if (downloadedModel.status == FYFontModelDownloadStatusToBeDownloaded) {
@@ -155,6 +165,7 @@ static NSString *const FYMainFontIndexKey = @"FYMainFontIndexKey";
             }
             model.status = downloadedModel.status;
             model.downloadProgress = downloadedModel.downloadProgress;
+            model.fileSizeUnknown = downloadedModel.fileSizeUnknown;
             break;
         }
     }
@@ -166,18 +177,17 @@ static NSString *const FYMainFontIndexKey = @"FYMainFontIndexKey";
     _fontURLStringArray = fontURLStringArray;
     NSMutableArray *fontModelArray = [NSMutableArray array];
     
-    // stand for system default font
-    [fontModelArray addObject:[FYFontModel modelWithURL:nil
-                                                 status:FYFontModelDownloadStatusDownloaded
-                                       downloadProgress:1.0f]];
+    FYFontModel *systemDefaultFontModel = [[FYFontModel alloc] init];
+    systemDefaultFontModel.status = FYFontModelDownloadStatusDownloaded;
+    systemDefaultFontModel.downloadProgress = 1.0f;
+    [fontModelArray addObject:systemDefaultFontModel];
     
     [fontURLStringArray enumerateObjectsUsingBlock:^(NSString * _Nonnull URLString, NSUInteger idx, BOOL * _Nonnull stop) {
         if ([URLString isKindOfClass:[NSString class]]) {
             NSURL *URL = [NSURL URLWithString:URLString];
             if ([URL isKindOfClass:[NSURL class]]) {
-                FYFontModel *model = [FYFontModel modelWithURL:URL
-                                                        status:FYFontModelDownloadStatusToBeDownloaded
-                                              downloadProgress:0.0f];
+                FYFontModel *model = [[FYFontModel alloc] init];
+                model.URL = URL;
                 NSString *cachePath = [self.fontCache cachedFilePathWithWebURL:URL];
                 if (cachePath) {
                     model.status = FYFontModelDownloadStatusDownloaded;

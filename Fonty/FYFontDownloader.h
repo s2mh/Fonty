@@ -13,6 +13,7 @@
 + (instancetype)sharedDownloader;
 
 - (void)downloadFontWithURL:(NSURL *)URL;
+- (void)cancelDownloadingFontWithURL:(NSURL *)URL;
 - (void)suspendDownloadWithURL:(NSURL *)URL;
 
 @end

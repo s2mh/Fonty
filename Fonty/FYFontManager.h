@@ -19,18 +19,21 @@
 - (UIFont *)fontWithURLString:(NSString *)URLString size:(CGFloat)size;
 
 - (UIFont *)mainFontOfSize:(CGFloat)size;
+
 @property (nonatomic, strong) NSArray<NSString *> *fontURLStringArray;
 @property (nonatomic, assign) NSInteger mainFontIndex;
 @property (nonatomic, strong, readonly) NSArray<FYFontModel *> *fontModelArray;
 
 - (void)downloadFontWithURL:(NSURL *)URL;
 - (void)downloadFontWithURLString:(NSString *)URLString;
-//- (void)deleteFontWithURL:(NSURL *)URL completeBlock:(void(^)())completeBlock;
-//- (void)deleteFontWithURLString:(NSString *)URLString completeBlock:(void(^)())completeBlock;
-- (void)deleteFontWithURL:(NSURL *)URL;
-- (void)deleteFontWithURLString:(NSString *)URLString;
+
+- (void)cancelDownloadingFontWithURL:(NSURL *)URL;
+- (void)cancelDownloadingFontWithURLString:(NSString *)URLString;
 
 - (void)pauseDownloadingWithURL:(NSURL *)URL;
 - (void)pauseDownloadingWithURLString:(NSString *)URLString;
+
+- (void)deleteFontWithURL:(NSURL *)URL;
+- (void)deleteFontWithURLString:(NSString *)URLString;
 
 @end

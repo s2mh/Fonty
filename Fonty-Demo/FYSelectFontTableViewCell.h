@@ -10,6 +10,8 @@
 
 @interface FYSelectFontTableViewCell : UITableViewCell
 
+@property (nonatomic, assign) BOOL striped;
+@property (nonatomic, assign) BOOL stripedPause;
 @property (nonatomic, assign) double downloadProgress;
 
 @end

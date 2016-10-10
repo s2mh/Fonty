@@ -12,3 +12,5 @@
 
 NSString *const FYNewFontDownloadNotification = @"FYNewFontDownloadNotification";
 NSString *const FYNewFontDownloadNotificationKey = @"FYNewFontDownloadNotificationKey"; // FYDowloadFontModel
+
+//const double FYNewFontFileSizeUnkownTag = -1.0f;
