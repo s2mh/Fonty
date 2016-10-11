@@ -35,7 +35,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uYp-9U-ANh">
-                                <string key="text">枫桥夜泊         
+                                <string key="text">枫桥夜泊              
 
 月落乌啼霜满天，江枫渔火对愁眠。
 姑苏城外寒山寺，夜半钟声到客船。</string>

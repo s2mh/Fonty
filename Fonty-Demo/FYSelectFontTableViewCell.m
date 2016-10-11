@@ -34,14 +34,14 @@
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-//    CAMediaTiming
+    
     CGRect downloadProgressLayerFrame = self.bounds;
     if (self.striped) {
-        if (self.stripedPause) {
-            [self pauseLayer:self.stripesLayer];
+        if (![self.stripesLayer animationForKey:@"position"]) {
+            [self animateStripes];
         } else {
-            if (![self.stripesLayer animationForKey:@"position"]) {
-                [self animateStripes];
+            if (self.stripedPause) {
+                [self pauseLayer:self.stripesLayer];
             } else {
                 [self resumeLayer:self.stripesLayer];
             }
@@ -70,19 +70,24 @@
     [self.stripesLayer addAnimation:animation forKey:@"position"];
     [self.downloadProgressLayer addSublayer:self.stripesLayer];
 }
-- (void)pauseLayer:(CALayer *)layer
-{
+
+- (void)pauseLayer:(CALayer *)layer {
+    if (layer.speed == 0.0f) {
+        return;
+    }
     CFTimeInterval pausedTime = [layer convertTime:CACurrentMediaTime() fromLayer:nil];
-    layer.speed = 0.0;
+    layer.speed = 0.0f;
     layer.timeOffset = pausedTime;
 }
 
-- (void)resumeLayer:(CALayer *)layer
-{
+- (void)resumeLayer:(CALayer *)layer {
+    if (layer.speed != 0.0f) {
+        return;
+    }
     CFTimeInterval pausedTime = [layer timeOffset];
-    layer.speed = 1.0;
-    layer.timeOffset = 0.0;
-    layer.beginTime = 0.0;
+    layer.speed = 1.0f;
+    layer.timeOffset = 0.0f;
+    layer.beginTime = 0.0f;
     CFTimeInterval timeSincePause = [layer convertTime:CACurrentMediaTime() fromLayer:nil] - pausedTime;
     layer.beginTime = timeSincePause;
 }

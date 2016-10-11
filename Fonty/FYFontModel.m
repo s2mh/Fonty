@@ -51,13 +51,12 @@
         } break;
             
         default: {
-            NSLog(@"countOfBytesReceived %lld, %lld", task.countOfBytesReceived, task.countOfBytesExpectedToReceive);
-            NSLog(@"\n");
-            if (model.downloadProgress == 1.0f) {
-                model.status = FYFontModelDownloadStatusDownloaded;
-            } else {
+            if (task.error) {
                 model.downloadProgress = 0.0f;
                 model.status = FYFontModelDownloadStatusToBeDownloaded;
+            } else {
+                model.downloadProgress = 1.0f;
+                model.status = FYFontModelDownloadStatusDownloaded;
             }
         }
             break;

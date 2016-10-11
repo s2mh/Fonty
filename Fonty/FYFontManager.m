@@ -128,6 +128,11 @@ static NSString *const FYMainFontIndexKey = @"FYMainFontIndexKey";
 }
 
 - (void)deleteFontWithURL:(NSURL *)URL {
+    for (FYFontModel *model in self.fontModelArray) {
+        if ([model.URL isEqual:URL]) {
+            model.status = FYFontModelDownloadStatusDeleting;
+        }
+    }
     if ([URL isKindOfClass:[NSURL class]]) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             NSString *cachePath = [self.fontCache cachedFilePathWithWebURL:URL];

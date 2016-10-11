@@ -64,7 +64,7 @@
     cell.textLabel.font = [UIFont fy_fontWithURL:model.URL size:17.0f];
     
     cell.downloadProgress = model.downloadProgress;
-    cell.striped = model.fileSizeUnknown;
+    cell.striped = (model.status == FYFontModelDownloadStatusDownloaded) ? NO : model.fileSizeUnknown;
     cell.stripedPause = (model.status == FYFontModelDownloadStatusSuspending);
     
     if (indexPath.row == self.fontManager.mainFontIndex) {
@@ -84,7 +84,6 @@
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         
         FYFontModel *model = [self.fontModelArray objectAtIndex:indexPath.row];
-        model.status = FYFontModelDownloadStatusDeleting;
         [tableView reloadData];
         
         [self.fontManager deleteFontWithURL:model.URL];
@@ -100,9 +99,9 @@
         [tableView reloadData];
     } else if (model.status == FYFontModelDownloadStatusDownloading) {
         [self.fontManager pauseDownloadingWithURL:model.URL];
-    }  else if (model.status == FYFontModelDownloadStatusSuspending) {
+    } else if (model.status == FYFontModelDownloadStatusSuspending) {
         [self.fontManager downloadFontWithURL:model.URL];
-    } else {
+    } else if (model.status == FYFontModelDownloadStatusToBeDownloaded) {
         UIAlertView *AV = [[UIAlertView alloc] initWithTitle:@"Download Font File from"
                                                      message:model.URL.absoluteString
                                                     delegate:self

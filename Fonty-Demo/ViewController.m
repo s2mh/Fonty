@@ -29,7 +29,7 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    [self.label setFont:[UIFont fy_mainFontOfSize:23.0f]];
+    [self.label setFont:[UIFont fy_mainFontOfSize:18.0f]];
 }
 
 - (IBAction)barButtonItemAction:(UIBarButtonItem *)sender {
