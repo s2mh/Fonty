@@ -31,10 +31,22 @@
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="写点什么" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="jco-6H-458">
+                                <frame key="frameInset" minY="226" width="375" height="49"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="49" id="r6F-cd-W07"/>
+                                </constraints>
+                                <nil key="textColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uYp-9U-ANh">
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="163" id="1Cm-Os-QnG"/>
+                                </constraints>
                                 <string key="text">枫桥夜泊              
 
 月落乌啼霜满天，江枫渔火对愁眠。
@@ -48,9 +60,11 @@
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="uYp-9U-ANh" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="711-ht-F2p"/>
+                            <constraint firstItem="jco-6H-458" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="Pmy-cc-iZv"/>
                             <constraint firstAttribute="trailing" secondItem="uYp-9U-ANh" secondAttribute="trailing" id="dsD-lm-mP7"/>
+                            <constraint firstItem="jco-6H-458" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="163" id="eLx-XK-H1T"/>
                             <constraint firstItem="uYp-9U-ANh" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="fT0-Bb-NyU"/>
-                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="uYp-9U-ANh" secondAttribute="bottom" id="g8G-LZ-fis"/>
+                            <constraint firstAttribute="trailing" secondItem="jco-6H-458" secondAttribute="trailing" id="ovL-Ll-A5h"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="qIY-i7-AI9">
@@ -62,11 +76,12 @@
                     </navigationItem>
                     <connections>
                         <outlet property="label" destination="uYp-9U-ANh" id="LWY-v1-ZkI"/>
+                        <outlet property="textField" destination="jco-6H-458" id="IXj-AQ-0hw"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="80.799999999999997" y="228.93553223388307"/>
+            <point key="canvasLocation" x="79.200000000000003" y="228.03598200899552"/>
         </scene>
     </scenes>
 </document>

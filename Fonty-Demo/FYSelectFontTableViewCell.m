@@ -33,6 +33,9 @@ static const CGFloat StripeWidth = 20.0f;
 - (void)layoutSubviews {
     [super layoutSubviews];
     if (self.downloadProgress == 1.0f) {
+        if ([self.textLabel.text hasPrefix:@"http"]) {
+            NSLog(@"self.textLabel.text %@", self.textLabel.text);
+        }
         [self.stripesLayer removeFromSuperlayer];
         [self.progressLayer removeFromSuperlayer];
         return;
@@ -132,7 +135,7 @@ static const CGFloat StripeWidth = 20.0f;
     if (!_progressLayer) {
         _progressLayer = [CAShapeLayer layer];
         _progressLayer.fillColor = [UIColor grayColor].CGColor;
-        _progressLayer.frame = CGRectMake(0.0f, 0.0f, self.bounds.size.width, self.bounds.size.height);
+        _progressLayer.path = [UIBezierPath bezierPathWithRect:self.bounds].CGPath;
         _progressLayer.opacity = 0.5f;
         _progressLayer.speed = 0.0f;
         

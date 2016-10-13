@@ -125,11 +125,14 @@ static NSString *const FYMainFontIndexKey = @"FYMainFontIndexKey";
 }
 
 - (void)deleteFontWithURL:(NSURL *)URL {
-    for (FYFontModel *model in self.fontModelArray) {
+    [self.fontModelArray enumerateObjectsUsingBlock:^(FYFontModel * _Nonnull model, NSUInteger idx, BOOL * _Nonnull stop) {
         if ([model.URL isEqual:URL]) {
             model.status = FYFontModelDownloadStatusDeleting;
+            if (idx == self.mainFontIndex) {
+                self.mainFontIndex = 0;
+            }
         }
-    }
+    }];
     if ([URL isKindOfClass:[NSURL class]]) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             NSString *cachePath = [self.fontCache cachedFilePathWithWebURL:URL];
@@ -160,9 +163,6 @@ static NSString *const FYMainFontIndexKey = @"FYMainFontIndexKey";
     for (FYFontModel *model in self.fontModelArray) {
         if ([model.URL isEqual:newModel.URL]) {
             [model setModel:newModel];
-            if (model.status == FYFontModelDownloadStatusToBeDownloaded) {
-                self.mainFontIndex = 0;
-            }
             break;
         }
     }

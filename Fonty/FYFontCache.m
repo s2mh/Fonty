@@ -45,7 +45,7 @@ static NSString * const FTFontCacheDirectoryName = @"FTFont";
 #pragma mark - Public
 
 - (NSString *)cachedFilePathWithWebURL:(NSURL *)webURL {
-    NSString *filePath = [self cachedFilePathForWebURLString:webURL.absoluteString];
+    NSString *filePath = [self filePathForWebURLString:webURL.absoluteString];
     if ([self.fileManager fileExistsAtPath:filePath]) {
         return filePath;
     } else {
@@ -54,7 +54,7 @@ static NSString * const FTFontCacheDirectoryName = @"FTFont";
 }
 
 - (NSString *)cacheFileAtLocolURL:(NSURL *)locolURL fromWebURL:(NSURL *)webURL {
-    NSString *filePath = [self cachedFilePathForWebURLString:webURL.absoluteString];
+    NSString *filePath = [self filePathForWebURLString:webURL.absoluteString];
     if (![self.fileManager fileExistsAtPath:filePath]) {
         [self.fileManager removeItemAtPath:filePath error:NULL];
     }
@@ -66,7 +66,7 @@ static NSString * const FTFontCacheDirectoryName = @"FTFont";
 }
 
 - (void)cleanCachedFileWithWebURL:(NSURL *)webURL {
-    NSString *filePath = [self cachedFilePathForWebURLString:webURL.absoluteString];
+    NSString *filePath = [self filePathForWebURLString:webURL.absoluteString];
     [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
     dispatch_async(dispatch_get_main_queue(), ^{
         FYFontModel *model = [[FYFontModel alloc] init];
@@ -78,7 +78,7 @@ static NSString * const FTFontCacheDirectoryName = @"FTFont";
 
 #pragma mark - Private
 
-- (NSString *)cachedFilePathForWebURLString:(NSString *)URLString {
+- (NSString *)filePathForWebURLString:(NSString *)URLString {
     NSString *fontFileName = [self.cachePaths objectForKey:URLString];
     if (!fontFileName) {
         const char *str = [URLString UTF8String];

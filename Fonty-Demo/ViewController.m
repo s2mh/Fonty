@@ -14,6 +14,7 @@
 @interface ViewController ()
 
 @property (weak, nonatomic) IBOutlet UILabel *label;
+@property (weak, nonatomic) IBOutlet UITextField *textField;
 
 @end
 
@@ -29,7 +30,9 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    [self.label setFont:[UIFont fy_mainFontOfSize:18.0f]];
+    [self.label setFont:[UIFont fy_mainFontOfSize:20.0f]];
+    [self.textField setFont:[UIFont fy_mainFontOfSize:20.0f]];
+    [self.textField becomeFirstResponder];
 }
 
 - (IBAction)barButtonItemAction:(UIBarButtonItem *)sender {

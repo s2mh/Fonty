@@ -31,7 +31,9 @@
     if (task.countOfBytesExpectedToReceive == NSURLSessionTransferSizeUnknown) {
         model.fileSizeUnknown = YES;
     } else {
-        model.downloadProgress = (double)task.countOfBytesReceived / task.countOfBytesExpectedToReceive;
+        if (task.countOfBytesExpectedToReceive) {
+            model.downloadProgress = (double)task.countOfBytesReceived / task.countOfBytesExpectedToReceive;
+        }
     }
     
     switch (task.state) {
@@ -80,7 +82,7 @@
     if (self.URL) {
         return self.URL.absoluteString;
     } else {
-        return @"system default font";
+        return @"Default Font";
     }
 }
 

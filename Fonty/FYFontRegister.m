@@ -45,7 +45,6 @@
     }
     CGFontRelease(fontRef);
     if (completeBlock) {
-        NSLog(@"completeBlock");
         completeBlock();
     }
 }
