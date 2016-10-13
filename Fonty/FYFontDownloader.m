@@ -43,15 +43,14 @@
 
 - (void)cancelDownloadingFontWithURL:(NSURL *)URL {
     NSURLSessionDownloadTask *downloadTask = [self.taskDictionary objectForKey:URL];
-    if (downloadTask) {
-//        [self freeTask:downloadTask];
+    if (downloadTask && (downloadTask.state == NSURLSessionTaskStateRunning || downloadTask.state == NSURLSessionTaskStateSuspended)) {
         [downloadTask cancelByProducingResumeData:^(NSData * _Nullable resumeData) {}];
     }
 }
 
 - (void)suspendDownloadWithURL:(NSURL *)URL {
     NSURLSessionDownloadTask *downloadTask = [self.taskDictionary objectForKey:URL];
-    if (downloadTask) {
+    if (downloadTask && (downloadTask.state == NSURLSessionTaskStateRunning)) {
         [downloadTask suspend];
     }
 }
@@ -100,7 +99,9 @@
 
 - (NSURLSession *)session {
     if (!_session) {
-        _session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
+        NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+        configuration.timeoutIntervalForRequest = FYNewFontDownloadTimeoutIntervalForRequest;
+        _session = [NSURLSession sessionWithConfiguration:configuration
                                                  delegate:self
                                             delegateQueue:nil];
     }

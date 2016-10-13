@@ -22,8 +22,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [[FYFontManager sharedManager] setFontURLStringArray:@[@"http://115.28.28.235:8080/xx.ttf",
-                                                           @"http://www.zhaozi.cn/e/enews/?enews=DownSoft&classid=297&id=22785&pathid=0&pass=6a9c20be7abab75c8128ada2c271b041&p=:::"]];
+    [[FYFontManager sharedManager] setFontURLStringArray:@[@"http://115.28.28.235:8088/SizeKnownFont.ttf",
+                                                           @"http://115.28.28.235:8088/SizeUnknownFont.ttf"]];
 }
 
 - (void)viewWillAppear:(BOOL)animated {

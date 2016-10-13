@@ -24,7 +24,9 @@ typedef NS_ENUM(NSUInteger, FYFontModelDownloadStatus) {
 @property (nonatomic, assign) double downloadProgress;
 @property (nonatomic, copy) NSString *postScriptName;
 @property (nonatomic, assign) BOOL fileSizeUnknown;
+@property (nonatomic, copy) NSError *downloadError;
 
 + (instancetype)modelWithSessionDownloadTask:(NSURLSessionDownloadTask *)task;
+- (void)setModel:(FYFontModel *)newModel;
 
 @end

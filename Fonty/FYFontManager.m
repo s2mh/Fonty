@@ -42,12 +42,12 @@ static NSString *const FYMainFontIndexKey = @"FYMainFontIndexKey";
 {
     self = [super init];
     if (self) {
-        _fontCache = [FYFontCache sharedFontCache];
+        _fontCache      = [FYFontCache sharedFontCache];
         _fontDownloader = [FYFontDownloader sharedDownloader];
-        _fontRegister = [FYFontRegister sharedRegister];
-        _mainFontIndex = [[[NSUserDefaults standardUserDefaults] objectForKey:FYMainFontIndexKey] integerValue];
+        _fontRegister   = [FYFontRegister sharedRegister];
+        _mainFontIndex  = [[[NSUserDefaults standardUserDefaults] objectForKey:FYMainFontIndexKey] integerValue];
         [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(changeModelStatus:)
+                                                 selector:@selector(handleModelInNotification:)
                                                      name:FYNewFontDownloadNotification
                                                    object:nil];
     }
@@ -65,7 +65,6 @@ static NSString *const FYMainFontIndexKey = @"FYMainFontIndexKey";
     if (![URL isKindOfClass:NSURL.class]) {
         return [UIFont systemFontOfSize:size];
     }
-    
     NSString *postScriptName = [self.postScriptNames objectForKey:URL.absoluteString];
     UIFont *font = [UIFont fontWithName:postScriptName size:size];
     
@@ -85,13 +84,11 @@ static NSString *const FYMainFontIndexKey = @"FYMainFontIndexKey";
                 }];
             }
         }
-        
         if (postScriptName) {
             // found postScriptName
             font = [UIFont fontWithName:postScriptName size:size];
         }
     }
-    
     return font;
 }
 
@@ -158,19 +155,14 @@ static NSString *const FYMainFontIndexKey = @"FYMainFontIndexKey";
 
 #pragma mark - Notification
 
-- (void)changeModelStatus:(NSNotification *)NSNotification {
-    FYFontModel *downloadedModel = [NSNotification.userInfo objectForKey:FYNewFontDownloadNotificationKey];
+- (void)handleModelInNotification:(NSNotification *)notification {
+    FYFontModel *newModel = [notification.userInfo objectForKey:FYNewFontDownloadNotificationKey];
     for (FYFontModel *model in self.fontModelArray) {
-        if ([model.URL isEqual:downloadedModel.URL]) {
-            if (downloadedModel.status == FYFontModelDownloadStatusDownloading && !model.fileSizeUnknown && model.downloadProgress > downloadedModel.downloadProgress) {
-                break;
-            }
-            if (downloadedModel.status == FYFontModelDownloadStatusToBeDownloaded) {
+        if ([model.URL isEqual:newModel.URL]) {
+            [model setModel:newModel];
+            if (model.status == FYFontModelDownloadStatusToBeDownloaded) {
                 self.mainFontIndex = 0;
             }
-            model.status = downloadedModel.status;
-            model.downloadProgress = downloadedModel.downloadProgress;
-            model.fileSizeUnknown = downloadedModel.fileSizeUnknown;
             break;
         }
     }

@@ -61,11 +61,23 @@
     FYSelectFontTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"FYSelectFontTableViewCell" forIndexPath:indexPath];
     
     cell.textLabel.text = model.description;
-    cell.textLabel.font = [UIFont fy_fontWithURL:model.URL size:17.0f];
+    cell.detailTextLabel.text = nil;
+    cell.textLabel.font = [UIFont fy_fontWithURL:model.URL size:16.0f];
     
     cell.downloadProgress = model.downloadProgress;
-    cell.striped = (model.status == FYFontModelDownloadStatusDownloaded) ? NO : model.fileSizeUnknown;
-    cell.stripedPause = (model.status == FYFontModelDownloadStatusSuspending);
+    cell.striped = NO;
+    cell.pauseStripes = NO;
+    
+    if (model.status == FYFontModelDownloadStatusToBeDownloaded) {
+        if (model.downloadError) {
+            cell.detailTextLabel.text = model.downloadError.localizedDescription;
+        }
+    } else if (model.status == FYFontModelDownloadStatusDownloading) {
+        cell.striped = model.fileSizeUnknown;
+    } else if (model.status == FYFontModelDownloadStatusSuspending) {
+        cell.striped = model.fileSizeUnknown;
+        cell.pauseStripes = YES;
+    }
     
     if (indexPath.row == self.fontManager.mainFontIndex) {
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
