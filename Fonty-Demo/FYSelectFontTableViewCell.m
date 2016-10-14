@@ -33,9 +33,6 @@ static const CGFloat StripeWidth = 20.0f;
 - (void)layoutSubviews {
     [super layoutSubviews];
     if (self.downloadProgress == 1.0f) {
-        if ([self.textLabel.text hasPrefix:@"http"]) {
-            NSLog(@"self.textLabel.text %@", self.textLabel.text);
-        }
         [self.stripesLayer removeFromSuperlayer];
         [self.progressLayer removeFromSuperlayer];
         return;
