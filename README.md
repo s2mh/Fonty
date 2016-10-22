@@ -1,5 +1,6 @@
 ## Fonty
-Use it to download, cache and register your font.
+用来下载，缓存，注册和删除应用中的字体。
+*Use it to download, cache, register and delete fonts in App.*
 
 ## CocoaPods
 Podfile:
@@ -13,22 +14,24 @@ end
 
 ## Usage
 
-### 1. By setting "main font"
+### 1."main font"
 
-- List URL strings of your font files and set one as main font:
+列举出你的字体文件所在的URL并设置一个主字体：
+*List URL strings of your font files and set one as main font:*
 
 ```objective-c
 #import "FYHeader.h"
 
 FYFontManager *fontManager = [FYFontManager sharedManager];
 
-fontManager.fontURLStringArray = @"http://115.28.28.235:8088/SizeKnownFont.ttf",
-                                 @"http://115.28.28.235:8088/SizeUnknownFont.ttf"; 
+fontManager.fontURLStringArray = @[@"http://115.28.28.235:8088/SizeKnownFont.ttf", 
+                                   @"http://115.28.28.235:8088/SizeUnknownFont.ttf"]; 
                                                                                                                   
 fontManager.mainFontIndex = 1;
 ```
     	
-- Get main font by category method.
+用类别方法来获取主字体：
+*Get main font by category method:*
 
 ```objective-c
 #import "UIFont+FY_Fonty.h"
@@ -37,7 +40,8 @@ self.label.font = [UIFont fy_mainFontOfSize:24.0f];
 ```
     	
 ### 2. From URL
-- Get font from URL by category method:	
+用类别方法来获取URL中的字体：
+*Get font from URL by category method:	*
 
 ```objective-c
 #import "UIFont+FY_Fonty.h"
