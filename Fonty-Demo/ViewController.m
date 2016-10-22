@@ -30,8 +30,8 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    [self.label setFont:[UIFont fy_mainFontOfSize:20.0f]];
-    [self.textField setFont:[UIFont fy_mainFontOfSize:20.0f]];
+    [self.label setFont:[UIFont fy_mainFontOfSize:24.0f]];
+    [self.textField setFont:[UIFont fy_mainFontOfSize:24.0f]];
     [self.textField becomeFirstResponder];
 }
 
