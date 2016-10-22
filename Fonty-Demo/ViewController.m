@@ -9,7 +9,6 @@
 #import "ViewController.h"
 #import "FYSelectFontViewController.h"
 #import "FYHeader.h"
-#import "UIFont+FY_Fonty.h"
 
 @interface ViewController ()
 

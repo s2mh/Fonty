@@ -17,5 +17,6 @@
 #import "FYFontModel.h"
 
 #import "FYConst.h"
+#import "UIFont+FY_Fonty.h"
 
 #endif /* FYHeader_h */
