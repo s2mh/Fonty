@@ -3,13 +3,13 @@ Use it to download, cache and register your font.
 
 ## CocoaPods
 Podfile:
-	
-	platform :ios, '7.0'
+```ruby
+platform :ios, '7.0'
 
-	target 'TargetName' do
-	pod 'Fonty'
-	end
-	
+target 'TargetName' do
+pod 'Fonty'
+end
+```
 
 ## Usage
 
@@ -17,26 +17,32 @@ Podfile:
 
 - List URL strings of your font files and set one as main font:
 
-		#import "FYHeader.h"
+```objective-c
+#import "FYHeader.h"
 	
-		FYFontManager *fontManager = [FYFontManager sharedManager];
-	 
-		fontManager.fontURLStringArray = @"http://115.28.28.235:8088/SizeKnownFont.ttf",
+FYFontManager *fontManager = [FYFontManager sharedManager];
+
+fontManager.fontURLStringArray = @"http://115.28.28.235:8088/SizeKnownFont.ttf",
                                          @"http://115.28.28.235:8088/SizeUnknownFont.ttf"; 
                                                                                                                   
-    	fontManager.mainFontIndex = 1;
+fontManager.mainFontIndex = 1;
+```
     	
-- Get main font by category method.
+- Get main font by category method.- 
 
-		#import "UIFont+FY_Fonty.h"
+```objective-c
+#import "UIFont+FY_Fonty.h"
 	
-    	self.label.font = [UIFont fy_mainFontOfSize:24.0f];
+self.label.font = [UIFont fy_mainFontOfSize:24.0f];
+```
     	
 ### 2. From URL
 - Get font from URL by category method:	
-	
-		NSURL *URL = [NSURL URLWithString:@"http://115.28.28.235:8088/SizeUnknownFont.ttf"];
-    	self.label.font = [UIFont fy_fontWithURL:URL size:24.0f];
+
+```objective-c
+NSURL *URL = [NSURL URLWithString:@"http://115.28.28.235:8088/SizeUnknownFont.ttf"];
+self.label.font = [UIFont fy_fontWithURL:URL size:24.0f];
+```
 
 ## Demo
 
