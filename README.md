@@ -79,7 +79,7 @@ UIFont *font = [UIFont fontWithName:@"SentyChalk" size:24.0f];
 
 字体下载，缓存和删除过程中，Fonty会在主线程中发出`FYFontStatusNotification`通知。你可以从该通知的`userInfo`字典里中获得一个`FYFontModel`的对象。`FYFontModel`描述了字体的信息，包括字体的下载URL，下载进度，状态和PostScriptName等。你可以通过接收这个通知，从而跟踪字体信息的变化。
 
-*Fonty will post notifications called “FYFontStatusNotification” in , when it is downloading, caching and deleting fonts. You can get a "FYFontModel" type object in the "userInfo" dictionary of the notifications. The "FYFontModel" class decribes the font infomation, including the download URL, download progress, status and PostScriptName. You can handle this notificaion to track changes of the font information.*
+*Fonty will post notifications called “FYFontStatusNotification” on the main thread, while it is downloading, caching or deleting fonts. You can get a "FYFontModel" type object in the "userInfo" dictionary of the notifications. The "FYFontModel" class decribes the font infomation, including the download URL, download progress, status and PostScriptName. You can handle this notificaion to track changes of the font information.*
 
 ## Demo
 
