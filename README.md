@@ -31,24 +31,38 @@ fontManager.mainFontIndex = 1;
 ```
     	
 用类别方法来获取主字体：
+
 *Get main font by category method:*
 
 ```objective-c
 #import "UIFont+FY_Fonty.h"
 
-self.label.font = [UIFont fy_mainFontOfSize:24.0f];
+UIFont *font = [UIFont fy_mainFontOfSize:24.0f];
 ```
     	
 ### 2. From URL
-用类别方法来获取URL中的字体：
-*Get font from URL by category method:	*
+用类别方法来获取URL中的字体：*Get font from URL by category method:*
 
 ```objective-c
 #import "UIFont+FY_Fonty.h"
 
 NSURL *URL = [NSURL URLWithString:@"http://115.28.28.235:8088/SizeUnknownFont.ttf"];
-self.label.font = [UIFont fy_fontWithURL:URL size:24.0f];
+UIFont *font = [UIFont fy_fontWithURL:URL size:24.0f];
 ```
+
+
+
+### 3.PostScript name
+
+如果你知道该字体的`PostScript name`，那么直接使用已有`UIFont.h`的方法获得字体：
+*List URL strings of your font files and set one as main font:*
+
+```objective-c
+UIFont *font = [UIFont fontWithName:@"Xxxx" size:24.0f];
+```
+
+用`Font Book`打开字体文件，就能找到对应的`PostScript name`了。例如：
+*List URL strings of your font files and set one as main font:*
 
 ## Demo
 
