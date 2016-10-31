@@ -41,7 +41,7 @@
     [super viewWillAppear:animated];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(noticeDownload:)
-                                                 name:FYNewFontDownloadNotification
+                                                 name:FYFontStatusNotification
                                                object:nil];
 }
 
@@ -62,7 +62,7 @@
     
     cell.textLabel.text = model.description;
     cell.detailTextLabel.text = nil;
-    cell.textLabel.font = [UIFont fy_fontWithURL:model.URL size:16.0f];
+    cell.textLabel.font = [UIFont fy_fontWithURL:model.downloadURL size:16.0f];
     
     cell.downloadProgress = model.downloadProgress;
     cell.striped = NO;
@@ -98,7 +98,7 @@
         FYFontModel *model = [self.fontModelArray objectAtIndex:indexPath.row];
         [tableView reloadData];
         
-        [self.fontManager deleteFontWithURL:model.URL];
+        [self.fontManager deleteFontWithURL:model.downloadURL];
     }
 }
 
@@ -110,12 +110,12 @@
         self.fontManager.mainFontIndex = indexPath.row;
         [tableView reloadData];
     } else if (model.status == FYFontModelDownloadStatusDownloading) {
-        [self.fontManager pauseDownloadingWithURL:model.URL];
+        [self.fontManager pauseDownloadingWithURL:model.downloadURL];
     } else if (model.status == FYFontModelDownloadStatusSuspending) {
-        [self.fontManager downloadFontWithURL:model.URL];
+        [self.fontManager downloadFontWithURL:model.downloadURL];
     } else if (model.status == FYFontModelDownloadStatusToBeDownloaded) {
         UIAlertView *AV = [[UIAlertView alloc] initWithTitle:@"Download Font File from"
-                                                     message:model.URL.absoluteString
+                                                     message:model.downloadURL.absoluteString
                                                     delegate:self
                                            cancelButtonTitle:@"cancel"
                                            otherButtonTitles:@"start", nil];
@@ -132,7 +132,7 @@
     FYFontModel *model = [self.fontModelArray objectAtIndex:indexPath.row];
     if ((model.status == FYFontModelDownloadStatusDownloaded ||
          model.status == FYFontModelDownloadStatusDownloading ||
-         model.status == FYFontModelDownloadStatusSuspending) && model.URL) {
+         model.status == FYFontModelDownloadStatusSuspending) && model.downloadURL) {
         return UITableViewCellEditingStyleDelete;
     } else {
         return UITableViewCellEditingStyleNone;
@@ -144,7 +144,7 @@
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     if (buttonIndex == 1) {
         FYFontModel *model = [self.fontModelArray objectAtIndex:alertView.tag];
-        [self.fontManager downloadFontWithURL:model.URL];
+        [self.fontManager downloadFontWithURL:model.downloadURL];
     }
 }
 

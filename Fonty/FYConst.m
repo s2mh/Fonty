@@ -10,7 +10,7 @@
 
 #import "FYConst.h"
 
-NSString *const FYNewFontDownloadNotification = @"FYNewFontDownloadNotification";
-NSString *const FYNewFontDownloadNotificationKey = @"FYNewFontDownloadNotificationKey"; // FYDowloadFontModel
+NSString *const FYFontStatusNotification = @"FYFontStatusNotification";
+NSString *const FYFontStatusNotificationKey = @"FYFontStatusNotificationKey"; // FYDowloadFontModel
 
 NSTimeInterval const FYNewFontDownloadTimeoutIntervalForRequest = 3 * 60.0f;

@@ -48,7 +48,7 @@ static NSString *const FYMainFontIndexKey = @"FYMainFontIndexKey";
         _mainFontIndex  = [[[NSUserDefaults standardUserDefaults] objectForKey:FYMainFontIndexKey] integerValue];
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(handleModelInNotification:)
-                                                     name:FYNewFontDownloadNotification
+                                                     name:FYFontStatusNotification
                                                    object:nil];
     }
     return self;
@@ -72,12 +72,12 @@ static NSString *const FYMainFontIndexKey = @"FYMainFontIndexKey";
         
         if (!postScriptName) {
             // searching postScriptName in cache
-            NSString *cachePath = [self.fontCache cachedFilePathWithWebURL:URL];
+            NSString *cachePath = [self.fontCache cachedFilePathWithDownloadURL:URL];
             if (cachePath) {
                 postScriptName = [self.fontRegister registerFontWithPath:cachePath completeBlock:^(NSString *registeredPostScriptName){
                     [self.postScriptNames setObject:registeredPostScriptName forKey:URL.absoluteString];
                     [self.fontModelArray enumerateObjectsUsingBlock:^(FYFontModel * _Nonnull model, NSUInteger idx, BOOL * _Nonnull stop) {
-                        if ([model.URL isEqual:URL]) {
+                        if ([model.downloadURL isEqual:URL]) {
                             model.postScriptName = registeredPostScriptName;
                         }
                     }];
@@ -101,7 +101,7 @@ static NSString *const FYMainFontIndexKey = @"FYMainFontIndexKey";
         return [UIFont systemFontOfSize:size];
     }
     FYFontModel *model = [self.fontModelArray objectAtIndex:self.mainFontIndex];
-    return [self fontWithURL:model.URL size:size];
+    return [self fontWithURL:model.downloadURL size:size];
 }
 
 - (void)downloadFontWithURL:(NSURL *)URL {
@@ -126,7 +126,7 @@ static NSString *const FYMainFontIndexKey = @"FYMainFontIndexKey";
 
 - (void)deleteFontWithURL:(NSURL *)URL {
     [self.fontModelArray enumerateObjectsUsingBlock:^(FYFontModel * _Nonnull model, NSUInteger idx, BOOL * _Nonnull stop) {
-        if ([model.URL isEqual:URL]) {
+        if ([model.downloadURL isEqual:URL]) {
             model.status = FYFontModelDownloadStatusDeleting;
             if (idx == self.mainFontIndex) {
                 self.mainFontIndex = 0;
@@ -135,9 +135,9 @@ static NSString *const FYMainFontIndexKey = @"FYMainFontIndexKey";
     }];
     if ([URL isKindOfClass:[NSURL class]]) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSString *cachePath = [self.fontCache cachedFilePathWithWebURL:URL];
+            NSString *cachePath = [self.fontCache cachedFilePathWithDownloadURL:URL];
             [self.fontRegister unregisterFontWithPath:cachePath completeBlock:^{
-                [self.fontCache cleanCachedFileWithWebURL:URL];
+                [self.fontCache cleanCachedFileWithDownloadURL:URL];
             }];
         });
     }
@@ -159,9 +159,9 @@ static NSString *const FYMainFontIndexKey = @"FYMainFontIndexKey";
 #pragma mark - Notification
 
 - (void)handleModelInNotification:(NSNotification *)notification {
-    FYFontModel *newModel = [notification.userInfo objectForKey:FYNewFontDownloadNotificationKey];
+    FYFontModel *newModel = [notification.userInfo objectForKey:FYFontStatusNotificationKey];
     for (FYFontModel *model in self.fontModelArray) {
-        if ([model.URL isEqual:newModel.URL]) {
+        if ([model.downloadURL isEqual:newModel.downloadURL]) {
             [model setModel:newModel];
             break;
         }
@@ -184,8 +184,8 @@ static NSString *const FYMainFontIndexKey = @"FYMainFontIndexKey";
             NSURL *URL = [NSURL URLWithString:URLString];
             if ([URL isKindOfClass:[NSURL class]]) {
                 FYFontModel *model = [[FYFontModel alloc] init];
-                model.URL = URL;
-                NSString *cachePath = [self.fontCache cachedFilePathWithWebURL:URL];
+                model.downloadURL = URL;
+                NSString *cachePath = [self.fontCache cachedFilePathWithDownloadURL:URL];
                 if (cachePath) {
                     model.status = FYFontModelDownloadStatusDownloaded;
                     model.downloadProgress = 1.0f;

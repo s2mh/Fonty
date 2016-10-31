@@ -15,8 +15,8 @@
 
 + (instancetype)sharedFontCache;
 
-- (NSString *)cachedFilePathWithWebURL:(NSURL *)webURL;
+- (NSString *)cachedFilePathWithDownloadURL:(NSURL *)webURL;
 - (NSString *)cacheFileAtLocolURL:(NSURL *)locolURL fromWebURL:(NSURL *)webURL;
-- (void)cleanCachedFileWithWebURL:(NSURL *)webURL;
+- (void)cleanCachedFileWithDownloadURL:(NSURL *)webURL;
 
 @end

@@ -9,8 +9,8 @@
 #ifndef FYConst_h
 #define FYConst_h
 
-extern NSString *const FYNewFontDownloadNotification;
-extern NSString *const FYNewFontDownloadNotificationKey;
+extern NSString *const FYFontStatusNotification;
+extern NSString *const FYFontStatusNotificationKey;
 
 
 extern NSTimeInterval const FYNewFontDownloadTimeoutIntervalForRequest;

@@ -14,7 +14,7 @@
 {
     self = [super init];
     if (self) {
-        _URL = nil;
+        _downloadURL = nil;
         _status = FYFontModelDownloadStatusToBeDownloaded;
         _downloadProgress = 0.0f;
         _postScriptName = @"";
@@ -26,7 +26,7 @@
 
 + (instancetype)modelWithSessionDownloadTask:(NSURLSessionDownloadTask *)task {
     FYFontModel *model = [[FYFontModel alloc] init];
-    model.URL = task.originalRequest.URL;
+    model.downloadURL = task.originalRequest.URL;
     
     if (task.countOfBytesExpectedToReceive == NSURLSessionTransferSizeUnknown) {
         model.fileSizeUnknown = YES;
@@ -68,7 +68,7 @@
     if (newModel.status == FYFontModelDownloadStatusDownloading && !self.fileSizeUnknown && self.downloadProgress > newModel.downloadProgress) {
         return;
     }    
-    self.URL                = newModel.URL;
+    self.downloadURL                = newModel.downloadURL;
     self.status             = newModel.status;
     self.downloadProgress   = newModel.downloadProgress;
     self.fileSizeUnknown    = newModel.fileSizeUnknown;
@@ -79,8 +79,8 @@
 
 - (NSString *)description
 {
-    if (self.URL) {
-        return self.URL.absoluteString;
+    if (self.downloadURL) {
+        return self.downloadURL.absoluteString;
     } else {
         return @"Default Font";
     }

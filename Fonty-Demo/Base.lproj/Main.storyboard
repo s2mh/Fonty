@@ -34,8 +34,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="jco-6H-458">
-                                <frame key="frameInset" minY="226" width="375" height="49"/>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="jco-6H-458">
                                 <constraints>
                                     <constraint firstAttribute="height" constant="49" id="r6F-cd-W07"/>
                                 </constraints>
@@ -62,7 +61,7 @@
                             <constraint firstItem="uYp-9U-ANh" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="711-ht-F2p"/>
                             <constraint firstItem="jco-6H-458" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="Pmy-cc-iZv"/>
                             <constraint firstAttribute="trailing" secondItem="uYp-9U-ANh" secondAttribute="trailing" id="dsD-lm-mP7"/>
-                            <constraint firstItem="jco-6H-458" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="163" id="eLx-XK-H1T"/>
+                            <constraint firstItem="jco-6H-458" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="162" id="eLx-XK-H1T"/>
                             <constraint firstItem="uYp-9U-ANh" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="fT0-Bb-NyU"/>
                             <constraint firstAttribute="trailing" secondItem="jco-6H-458" secondAttribute="trailing" id="ovL-Ll-A5h"/>
                         </constraints>

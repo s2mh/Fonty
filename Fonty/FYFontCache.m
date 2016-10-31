@@ -44,7 +44,7 @@ static NSString * const FTFontCacheDirectoryName = @"FTFont";
 
 #pragma mark - Public
 
-- (NSString *)cachedFilePathWithWebURL:(NSURL *)webURL {
+- (NSString *)cachedFilePathWithDownloadURL:(NSURL *)webURL {
     NSString *filePath = [self filePathForWebURLString:webURL.absoluteString];
     if ([self.fileManager fileExistsAtPath:filePath]) {
         return filePath;
@@ -65,14 +65,14 @@ static NSString * const FTFontCacheDirectoryName = @"FTFont";
     return filePath;
 }
 
-- (void)cleanCachedFileWithWebURL:(NSURL *)webURL {
+- (void)cleanCachedFileWithDownloadURL:(NSURL *)webURL {
     NSString *filePath = [self filePathForWebURLString:webURL.absoluteString];
     [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
     dispatch_async(dispatch_get_main_queue(), ^{
         FYFontModel *model = [[FYFontModel alloc] init];
-        model.URL = webURL;
-        NSDictionary *userInfo = @{FYNewFontDownloadNotificationKey:model};
-        [[NSNotificationCenter defaultCenter] postNotificationName:FYNewFontDownloadNotification object:self userInfo:userInfo];
+        model.downloadURL = webURL;
+        NSDictionary *userInfo = @{FYFontStatusNotificationKey:model};
+        [[NSNotificationCenter defaultCenter] postNotificationName:FYFontStatusNotification object:self userInfo:userInfo];
     });
 }
 
