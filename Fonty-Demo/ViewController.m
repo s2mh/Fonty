@@ -21,15 +21,12 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    [[FYFontManager sharedManager] setFontURLStringArray:@[@"http://115.28.28.235:8088/SizeKnownFont.ttf",
-                                                           @"http://115.28.28.235:8088/SizeUnknownFont.ttf"]];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    [self.label setFont:[UIFont fy_mainFontOfSize:24.0f]];
+    [self.label setFont:[UIFont systemFontOfSize:24.0f]];
     [self.textField setFont:[UIFont fy_mainFontOfSize:24.0f]];
     [self.textField becomeFirstResponder];
 }
