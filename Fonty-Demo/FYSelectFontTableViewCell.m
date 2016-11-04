@@ -52,6 +52,15 @@ static const CGFloat StripeWidth = 20.0f;
     }
 }
 
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+    if (selected) {
+        self.accessoryType = UITableViewCellAccessoryCheckmark;
+    } else {
+        self.accessoryType = UITableViewCellAccessoryNone;
+    }
+}
+
 #pragma mark - Private
 
 - (void)pauseLayer:(CALayer *)layer {

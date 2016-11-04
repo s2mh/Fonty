@@ -8,7 +8,6 @@
 
 #import <CommonCrypto/CommonDigest.h>
 #import "FYFontCache.h"
-#import "FYFontModel.h"
 #import "FYFontDownloader.h"
 #import "FYConst.h"
 
@@ -44,8 +43,24 @@ static NSString * const FTFontCacheDirectoryName = @"FTFont";
 
 #pragma mark - Public
 
-- (NSString *)cachedFilePathWithDownloadURL:(NSURL *)webURL {
-    NSString *filePath = [self filePathForWebURLString:webURL.absoluteString];
+- (BOOL)cacheObject:(id)object cacheFileName:(NSString *)cacheFileName {
+    NSString *cachePath = [self.diskCacheDirectoryPath stringByAppendingPathComponent:cacheFileName];
+    NSData *cacheData = [NSKeyedArchiver archivedDataWithRootObject:object];
+    return [cacheData writeToFile:cachePath atomically:YES];
+}
+
+- (instancetype)objectFromCacheWithFileName:(NSString *)cacheFileName {
+    NSString *cachePath = [self.diskCacheDirectoryPath stringByAppendingPathComponent:cacheFileName];
+    NSData *cacheData = [NSData dataWithContentsOfFile:cachePath];
+    if (cacheData) {
+        return [NSKeyedUnarchiver unarchiveObjectWithData:cacheData];
+    } else {
+        return nil;
+    }
+}
+
+- (NSString *)cachedFilePathWithDownloadURL:(NSURL *)downloadURL {
+    NSString *filePath = [self filePathForDownloadURLString:downloadURL.absoluteString];
     if ([self.fileManager fileExistsAtPath:filePath]) {
         return filePath;
     } else {
@@ -53,32 +68,35 @@ static NSString * const FTFontCacheDirectoryName = @"FTFont";
     }
 }
 
-- (NSString *)cacheFileAtLocolURL:(NSURL *)locolURL fromWebURL:(NSURL *)webURL {
-    NSString *filePath = [self filePathForWebURLString:webURL.absoluteString];
-    if (![self.fileManager fileExistsAtPath:filePath]) {
+- (void)cacheFileAtLocolURL:(NSURL *)locolURL fromDownloadURL:(NSURL *)downloadURL {
+    NSString *filePath = [self filePathForDownloadURLString:downloadURL.absoluteString];
+    if ([self.fileManager fileExistsAtPath:filePath]) {
         [self.fileManager removeItemAtPath:filePath error:NULL];
     }
     NSURL *docsDirURL = [NSURL fileURLWithPath:filePath];
     [self.fileManager moveItemAtURL:locolURL
-                         toURL:docsDirURL
-                         error:NULL];
-    return filePath;
+                              toURL:docsDirURL
+                              error:NULL];
+    
+    if (self.didCacheFileBlock) {
+        self.didCacheFileBlock(downloadURL.absoluteString);
+    };
 }
 
-- (void)cleanCachedFileWithDownloadURL:(NSURL *)webURL {
-    NSString *filePath = [self filePathForWebURLString:webURL.absoluteString];
-    [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        FYFontModel *model = [[FYFontModel alloc] init];
-        model.downloadURL = webURL;
-        NSDictionary *userInfo = @{FYFontStatusNotificationKey:model};
-        [[NSNotificationCenter defaultCenter] postNotificationName:FYFontStatusNotification object:self userInfo:userInfo];
+- (void)cleanCachedFileWithDownloadURL:(NSURL *)downloadURL {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        
+        NSString *filePath = [self filePathForDownloadURLString:downloadURL.absoluteString];
+        [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
+        if (self.didCleanFileBlock) {
+            self.didCleanFileBlock(downloadURL.absoluteString);
+        };
     });
 }
 
 #pragma mark - Private
 
-- (NSString *)filePathForWebURLString:(NSString *)URLString {
+- (NSString *)filePathForDownloadURLString:(NSString *)URLString {
     NSString *fontFileName = [self.cachePaths objectForKey:URLString];
     if (!fontFileName) {
         const char *str = [URLString UTF8String];

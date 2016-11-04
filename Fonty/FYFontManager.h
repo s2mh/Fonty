@@ -7,54 +7,51 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
+#import <UIKit/UIFont.h>
 
 @class FYFontModel;
 
 @interface FYFontManager : NSObject
 
-+ (instancetype)sharedManager;
++ (void)setFontURLStringArray:(NSArray<NSString *> *)fontURLStringArray;
++ (void)setBoldFontURLStringArray:(NSArray<NSString *> *)boldFontURLStringArray;
++ (void)setItalicFontURLStringArray:(NSArray<NSString *> *)italicFontURLStringArray;
 
-- (UIFont *)fontWithURL:(NSURL *)URL size:(CGFloat)size;
-- (UIFont *)fontWithURLString:(NSString *)URLString size:(CGFloat)size;
+@property (nonatomic, assign, class) NSInteger mainFontIndex;
+@property (nonatomic, assign, class) NSInteger mainBoldFontIndex;
+@property (nonatomic, assign, class) NSInteger mainItalicFontIndex;
 
-- (void)downloadFontWithURL:(NSURL *)URL;
-- (void)downloadFontWithURLString:(NSString *)URLString;
+@property (nonatomic, strong, readonly, class) NSArray<FYFontModel *> *fontModelArray;
+@property (nonatomic, strong, readonly, class) NSArray<FYFontModel *> *boldFontModelArray;
+@property (nonatomic, strong, readonly, class) NSArray<FYFontModel *> *italicFontModelArray;
 
-- (void)cancelDownloadingFontWithURL:(NSURL *)URL;
-- (void)cancelDownloadingFontWithURLString:(NSString *)URLString;
++ (UIFont *)mainFontOfSize:(CGFloat)size;
++ (UIFont *)mainBoldFontOfSize:(CGFloat)size;
++ (UIFont *)mainItalicFontOfSize:(CGFloat)size;
 
-- (void)pauseDownloadingWithURL:(NSURL *)URL;
-- (void)pauseDownloadingWithURLString:(NSString *)URLString;
++ (UIFont *)fontWithURL:(NSURL *)URL size:(CGFloat)size;
++ (UIFont *)fontWithURLString:(NSString *)URLString size:(CGFloat)size;
 
-- (void)deleteFontWithURL:(NSURL *)URL;
-- (void)deleteFontWithURLString:(NSString *)URLString;
++ (void)downloadFontWithURL:(NSURL *)URL;
++ (void)downloadFontWithURLString:(NSString *)URLString;
 
++ (void)cancelDownloadingFontWithURL:(NSURL *)URL;
++ (void)cancelDownloadingFontWithURLString:(NSString *)URLString;
 
-@property (nonatomic, assign) NSInteger mainFontIndex;
-@property (nonatomic, assign) NSInteger mainBoldFontIndex;
-@property (nonatomic, assign) NSInteger mainItalicFontIndex;
++ (void)pauseDownloadingWithURL:(NSURL *)URL;
++ (void)pauseDownloadingWithURLString:(NSString *)URLString;
 
-@property (nonatomic, strong) NSArray<NSString *> *fontURLStringArray;
-@property (nonatomic, strong) NSArray<NSString *> *boldFontURLStringArray;
-@property (nonatomic, strong) NSArray<NSString *> *italicFontURLStringArray;
-
-@property (nonatomic, strong, readonly) NSArray<FYFontModel *> *fontModelArray;
-@property (nonatomic, strong, readonly) NSArray<FYFontModel *> *boldFontModelArray;
-@property (nonatomic, strong, readonly) NSArray<FYFontModel *> *italicFontModelArray;
-
-- (UIFont *)mainFontOfSize:(CGFloat)size;
-- (UIFont *)mainBoldFontOfSize:(CGFloat)size;
-- (UIFont *)mainItalicFontOfSize:(CGFloat)size;
++ (void)deleteFontWithURL:(NSURL *)URL;
++ (void)deleteFontWithURLString:(NSString *)URLString;
 
 @end
 
 @interface FYFontManager (Style)
 
-@property (nonatomic, getter=isUsingFontyStyle) BOOL usingFontyStyle;
+@property (nonatomic, getter=isUsingFontyStyle, class) BOOL usingFontyStyle;
 
-- (UIFont *)UIFontSystemFontOfSize:(CGFloat)fontSize;
-- (UIFont *)UIFontBoldSystemFontOfSize:(CGFloat)fontSize;
-- (UIFont *)UIFontItalicSystemFontOfSize:(CGFloat)fontSize;
++ (UIFont *)UIFontSystemFontOfSize:(CGFloat)fontSize;
++ (UIFont *)UIFontBoldSystemFontOfSize:(CGFloat)fontSize;
++ (UIFont *)UIFontItalicSystemFontOfSize:(CGFloat)fontSize;
 
 @end

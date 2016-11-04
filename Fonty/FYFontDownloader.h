@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "FYFontModel.h"
 
 @interface FYFontDownloader : NSObject
 
@@ -15,5 +16,7 @@
 - (void)downloadFontWithURL:(NSURL *)URL;
 - (void)cancelDownloadingFontWithURL:(NSURL *)URL;
 - (void)suspendDownloadWithURL:(NSURL *)URL;
+
+@property (nonatomic, copy) void(^trackDownloadBlock)(FYFontModel *currentModel);
 
 @end

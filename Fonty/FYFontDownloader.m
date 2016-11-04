@@ -8,7 +8,6 @@
 
 #import "FYFontDownloader.h"
 #import "FYFontCache.h"
-#import "FYFontModel.h"
 #import "FYConst.h"
 
 @interface FYFontDownloader () <NSURLSessionDownloadDelegate>
@@ -67,7 +66,7 @@
 
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask
                               didFinishDownloadingToURL:(NSURL *)location {
-    [[FYFontCache sharedFontCache] cacheFileAtLocolURL:location fromWebURL:downloadTask.originalRequest.URL];
+    [[FYFontCache sharedFontCache] cacheFileAtLocolURL:location fromDownloadURL:downloadTask.originalRequest.URL];
     [self trackDownloadTask:downloadTask];
 }
 
@@ -81,13 +80,16 @@
 #pragma mark - Private
 
 - (void)trackDownloadTask:(NSURLSessionDownloadTask *)task {
-    NSDictionary *userInfo = @{FYFontStatusNotificationKey:[FYFontModel modelWithSessionDownloadTask:task]};
+    if (self.trackDownloadBlock) {
+        self.trackDownloadBlock([FYFontModel modelWithSessionDownloadTask:task]);
+    }
+//    NSDictionary *userInfo = @{FYFontStatusNotificationKey:[FYFontModel modelWithSessionDownloadTask:task]};
     if (task.state == NSURLSessionTaskStateCompleted) {
         [self freeTask:task];
     }
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:FYFontStatusNotification object:self userInfo:userInfo];
-    });
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        [[NSNotificationCenter defaultCenter] postNotificationName:FYFontStatusNotification object:self userInfo:userInfo];
+//    });
 }
 
 - (void)freeTask:(NSURLSessionDownloadTask *)task {

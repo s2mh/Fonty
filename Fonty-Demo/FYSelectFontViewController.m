@@ -13,13 +13,6 @@
 #import "FYHeader.h"
 #import "UIFont+FY_Fonty.h"
 
-@interface FYSelectFontViewController () <UIAlertViewDelegate>
-
-@property (nonatomic, weak) FYFontManager *fontManager;
-@property (nonatomic, weak) NSArray *fontModelArray;
-
-@end
-
 @implementation FYSelectFontViewController
 
 - (void)viewDidLoad {
@@ -31,10 +24,13 @@
                                                                              target:self
                                                                              action:@selector(backAction)];
     
-    self.fontManager = [FYFontManager sharedManager];
-    self.fontModelArray = self.fontManager.fontModelArray;
-    
     [self.tableView registerClass:[FYSelectFontTableViewCell class] forCellReuseIdentifier:@"FYSelectFontTableViewCell"];
+    
+//    UITableViewCell *targetCell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:self.fontManager.mainFontIndex inSection:0]];
+//    [targetCell setSelected:YES animated:YES];
+//    [self.tableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:self.fontManager.mainFontIndex inSection:0]
+//                                animated:NO
+//                          scrollPosition:UITableViewScrollPositionNone];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -53,16 +49,16 @@
 #pragma mark - UITableViewDataSource
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.fontModelArray.count;
+    return FYFontManager.fontModelArray.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    FYFontModel *model = [self.fontModelArray objectAtIndex:indexPath.row];
+    FYFontModel *model = [FYFontManager.fontModelArray objectAtIndex:indexPath.row];
     FYSelectFontTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"FYSelectFontTableViewCell" forIndexPath:indexPath];
-    
+    NSLog(@"%li", (long)indexPath.row);
     cell.textLabel.text = model.description;
-    cell.detailTextLabel.text = nil;
     cell.textLabel.font = [UIFont fy_fontWithURL:model.downloadURL size:16.0f];
+    cell.detailTextLabel.text = nil;
     
     cell.downloadProgress = model.downloadProgress;
     cell.striped = NO;
@@ -77,42 +73,40 @@
     } else if (model.status == FYFontModelDownloadStatusSuspending) {
         cell.striped = model.fileSizeUnknown;
         cell.pauseStripes = YES;
+    } else if (model.status == FYFontModelDownloadStatusDownloaded) {
+        cell.detailTextLabel.text = [NSString stringWithFormat:@"size: %.2fM", model.fileSize / 1000000.0f];
     }
-    
-    if (indexPath.row == self.fontManager.mainFontIndex) {
-        cell.accessoryType = UITableViewCellAccessoryCheckmark;
-    } else {
-        cell.accessoryType = UITableViewCellAccessoryNone;
-    }
+   
+    [cell setSelected:(indexPath.row == FYFontManager.mainFontIndex) animated:NO];
     return cell;
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    FYFontModel *model = [self.fontModelArray objectAtIndex:indexPath.row];
+    FYFontModel *model = [FYFontManager.fontModelArray objectAtIndex:indexPath.row];
     return model.status == FYFontModelDownloadStatusDownloaded;
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         
-        FYFontModel *model = [self.fontModelArray objectAtIndex:indexPath.row];
+        FYFontModel *model = [FYFontManager.fontModelArray objectAtIndex:indexPath.row];
         [tableView reloadData];
         
-        [self.fontManager deleteFontWithURL:model.downloadURL];
+        [FYFontManager deleteFontWithURL:model.downloadURL];
     }
 }
 
 #pragma mark UITableViewDelegate
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    FYFontModel *model = [self.fontModelArray objectAtIndex:indexPath.row];
+- (NSIndexPath *)tableView:(UITableView *)tableView willSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    FYFontModel *model = [FYFontManager.fontModelArray objectAtIndex:indexPath.row];
     if (model.status == FYFontModelDownloadStatusDownloaded) {
-        self.fontManager.mainFontIndex = indexPath.row;
-        [tableView reloadData];
+        FYFontManager.mainFontIndex = indexPath.row;
+        return indexPath;
     } else if (model.status == FYFontModelDownloadStatusDownloading) {
-        [self.fontManager pauseDownloadingWithURL:model.downloadURL];
+        [FYFontManager pauseDownloadingWithURL:model.downloadURL];
     } else if (model.status == FYFontModelDownloadStatusSuspending) {
-        [self.fontManager downloadFontWithURL:model.downloadURL];
+        [FYFontManager downloadFontWithURL:model.downloadURL];
     } else if (model.status == FYFontModelDownloadStatusToBeDownloaded) {
         UIAlertView *AV = [[UIAlertView alloc] initWithTitle:@"Download Font File from"
                                                      message:model.downloadURL.absoluteString
@@ -122,6 +116,7 @@
         AV.tag = indexPath.row;
         [AV show];
     }
+    return nil;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -129,7 +124,7 @@
 }
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
-    FYFontModel *model = [self.fontModelArray objectAtIndex:indexPath.row];
+    FYFontModel *model = [FYFontManager.fontModelArray objectAtIndex:indexPath.row];
     if ((model.status == FYFontModelDownloadStatusDownloaded ||
          model.status == FYFontModelDownloadStatusDownloading ||
          model.status == FYFontModelDownloadStatusSuspending) && model.downloadURL) {
@@ -143,15 +138,21 @@
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     if (buttonIndex == 1) {
-        FYFontModel *model = [self.fontModelArray objectAtIndex:alertView.tag];
-        [self.fontManager downloadFontWithURL:model.downloadURL];
+        FYFontModel *model = [FYFontManager.fontModelArray objectAtIndex:alertView.tag];
+        [FYFontManager downloadFontWithURL:model.downloadURL];
     }
 }
 
 #pragma mark - Notification
 
 - (void)noticeDownload:(NSNotification *)notification {
-    [self.tableView reloadData];
+    FYFontModel *newModel = [notification.userInfo objectForKey:FYFontStatusNotificationKey];
+    NSInteger targetRow = [FYFontManager.fontModelArray indexOfObjectPassingTest:^BOOL(FYFontModel * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        return [obj.downloadURL.absoluteString isEqualToString:newModel.downloadURL.absoluteString];
+    }];
+    NSIndexPath *targetIndexPath = [NSIndexPath indexPathForRow:targetRow inSection:0];
+    [self.tableView reloadRowsAtIndexPaths:@[targetIndexPath]
+                          withRowAnimation:UITableViewRowAnimationNone];
 }
 
 #pragma mark - Action 

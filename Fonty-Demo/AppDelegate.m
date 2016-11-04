@@ -17,10 +17,9 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     
-    FYFontManager *fontManager = [FYFontManager sharedManager];
-    [fontManager setFontURLStringArray:@[@"http://115.28.28.235:8088/SizeKnownFont.ttf",
-                                         @"http://115.28.28.235:8088/SizeUnknownFont.ttf"]];
-    [fontManager setUsingFontyStyle:YES];
+    [FYFontManager setFontURLStringArray:@[@"http://115.28.28.235:8088/SizeKnownFont.ttf",
+                                           @"http://115.28.28.235:8088/SizeUnknownFont.ttf"]];
+    [FYFontManager setUsingFontyStyle:YES];
     return YES;
 }
 

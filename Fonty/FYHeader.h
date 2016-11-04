@@ -15,6 +15,7 @@
 #import "FYFontRegister.h"
 
 #import "FYFontModel.h"
+#import "FYFontModelCenter.h"
 
 #import "FYConst.h"
 #import "UIFont+FY_Fonty.h"
