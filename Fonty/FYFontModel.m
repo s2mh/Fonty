@@ -18,10 +18,11 @@
     if (self) {
         _downloadURL = nil;
         _status = FYFontModelDownloadStatusToBeDownloaded;
+        _type = FYFontTypeFont;
         _downloadProgress = 0.0f;
         _postScriptName = @"";
         _fileSize = 0.0f;
-        _fileSizeUnknown = YES;
+        _fileSizeUnknown = NO;
         _downloadError = nil;
     }
     return self;
@@ -47,7 +48,7 @@
             model.status = FYFontModelDownloadStatusDownloading;
         } break;
             
-        default: {
+        case NSURLSessionTaskStateCompleted: {
             if (task.error) {
                 model.fileDownloadedSize = 0.0f;
                 model.status = FYFontModelDownloadStatusToBeDownloaded;
@@ -66,7 +67,7 @@
     } else {
         model.downloadProgress = 0.0f;
     }
-    model.fileSizeUnknown = ((model.fileSize == NSURLSessionTransferSizeUnknown) || (model.fileSize == 0.0f));
+    model.fileSizeUnknown = (model.fileSize == NSURLSessionTransferSizeUnknown);
     
     return model;
 }
@@ -77,6 +78,7 @@
     for (unsigned int i = 0; i < propertyCount; i++) {
         objc_property_t property = properties[i];
         NSString *key = [NSString stringWithUTF8String:property_getName(property)];
+        if ([key isEqualToString:@"type"]) continue;
         [self setValue:[newModel valueForKey:key] forKey:key];
     }
 }
@@ -86,7 +88,11 @@
     if (self.downloadURL) {
         return self.downloadURL.absoluteString;
     } else {
-        return @"Default Font";
+        switch (self.type) {
+            case FYFontTypeFont:        return @"Default Font";
+            case FYFontTypeBoldFont:    return @"Default Bold Font";
+            case FYFontTypeItalicFont:  return @"Default Italic Font";
+        }
     }
 }
 

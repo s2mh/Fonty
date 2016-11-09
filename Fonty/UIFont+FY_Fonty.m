@@ -14,6 +14,14 @@
     return [FYFontManager mainFontOfSize:size];
 }
 
++ (UIFont *)fy_mainBoldFontOfSize:(CGFloat)size {
+    return [FYFontManager mainBoldFontOfSize:size];
+}
+
++ (UIFont *)fy_mainItalicFontOfSize:(CGFloat)size {
+    return [FYFontManager mainItalicFontOfSize:size];
+}
+
 + (UIFont *)fy_fontWithURL:(NSURL *)URL size:(CGFloat)size {
     return [FYFontManager fontWithURL:URL size:size];
 }

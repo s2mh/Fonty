@@ -17,9 +17,16 @@ typedef NS_ENUM(NSUInteger, FYFontModelDownloadStatus) {
     FYFontModelDownloadStatusDeleting
 };
 
+typedef NS_ENUM(NSUInteger, FYFontType) {
+    FYFontTypeFont = 0,
+    FYFontTypeBoldFont,
+    FYFontTypeItalicFont,
+};
+
 @interface FYFontModel : NSObject
 
 @property (nonatomic, assign) FYFontModelDownloadStatus status;
+@property (nonatomic, assign) FYFontType type;
 
 @property (nonatomic, copy) NSString *postScriptName;
 

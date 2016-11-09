@@ -83,13 +83,9 @@
     if (self.trackDownloadBlock) {
         self.trackDownloadBlock([FYFontModel modelWithSessionDownloadTask:task]);
     }
-//    NSDictionary *userInfo = @{FYFontStatusNotificationKey:[FYFontModel modelWithSessionDownloadTask:task]};
     if (task.state == NSURLSessionTaskStateCompleted) {
         [self freeTask:task];
     }
-//    dispatch_async(dispatch_get_main_queue(), ^{
-//        [[NSNotificationCenter defaultCenter] postNotificationName:FYFontStatusNotification object:self userInfo:userInfo];
-//    });
 }
 
 - (void)freeTask:(NSURLSessionDownloadTask *)task {

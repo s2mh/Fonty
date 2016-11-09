@@ -84,8 +84,7 @@ static NSString * const FTFontCacheDirectoryName = @"FTFont";
 }
 
 - (void)cleanCachedFileWithDownloadURL:(NSURL *)downloadURL {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{        
         NSString *filePath = [self filePathForDownloadURLString:downloadURL.absoluteString];
         [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
         if (self.didCleanFileBlock) {

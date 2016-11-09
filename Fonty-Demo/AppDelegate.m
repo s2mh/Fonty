@@ -19,6 +19,9 @@
     
     [FYFontManager setFontURLStringArray:@[@"http://115.28.28.235:8088/SizeKnownFont.ttf",
                                            @"http://115.28.28.235:8088/SizeUnknownFont.ttf"]];
+    [FYFontManager setBoldFontURLStringArray:@[@"http://115.28.28.235:8088/SizeKnownBoldFont.ttf",
+                                               @"http://115.28.28.235:8088/SizeUnknownBoldFont.otf"]];
+    [FYFontManager setItalicFontURLStringArray:@[]];
     [FYFontManager setUsingFontyStyle:YES];
     return YES;
 }

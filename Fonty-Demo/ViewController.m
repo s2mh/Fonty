@@ -27,7 +27,8 @@
     [super viewWillAppear:animated];
     
     [self.label setFont:[UIFont systemFontOfSize:24.0f]];
-    [self.textField setFont:[UIFont fy_mainFontOfSize:24.0f]];
+//    [self.textField setFont:[UIFont fy_mainFontOfSize:24.0f]];
+    [self.textField setFont:[UIFont boldSystemFontOfSize:24.0f]];
     [self.textField becomeFirstResponder];
 }
 

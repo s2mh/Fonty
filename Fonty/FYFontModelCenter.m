@@ -49,10 +49,11 @@
 
 #pragma mark - Private
 
-+ (NSArray<FYFontModel *> *)assembleModelArrayWithURLStringArray:(NSArray<NSString *> *)fontURLStringArray {
++ (NSArray<FYFontModel *> *)assembleModelArrayWithURLStringArray:(NSArray<NSString *> *)fontURLStringArray type:(FYFontType)type{
     NSMutableArray *fontModelArray = [NSMutableArray array];
     
     FYFontModel *systemDefaultFontModel = [[FYFontModel alloc] init];
+    systemDefaultFontModel.type = type;
     systemDefaultFontModel.status = FYFontModelDownloadStatusDownloaded;
     systemDefaultFontModel.downloadProgress = 1.0f;
     systemDefaultFontModel.fileSizeUnknown = NO;
@@ -63,6 +64,7 @@
             NSURL *URL = [NSURL URLWithString:URLString];
             if ([URL isKindOfClass:[NSURL class]]) {
                 FYFontModel *model = [[FYFontModel alloc] init];
+                model.type = type;
                 model.downloadURL = URL;
                 NSString *cachePath = [[FYFontCache sharedFontCache] cachedFilePathWithDownloadURL:URL];
                 if (cachePath) {
@@ -81,19 +83,22 @@
 + (void)setFontURLStringArray:(NSArray<NSString *> *)URLStringArray {
     FYFontModelCenter *center = [FYFontModelCenter defaultCenter];
     center.fontURLStringArray = URLStringArray;
-    [center.fontModelArray setArray:[self assembleModelArrayWithURLStringArray:center.fontURLStringArray]];
+    [center.fontModelArray setArray:[self assembleModelArrayWithURLStringArray:center.fontURLStringArray
+                                                                          type:FYFontTypeFont]];
 }
 
 + (void)setBoldFontURLStringArray:(NSArray<NSString *> *)URLStringArray{
     FYFontModelCenter *center = [FYFontModelCenter defaultCenter];
     center.boldFontURLStringArray = URLStringArray;
-    [center.boldFontModelArray setArray:[self assembleModelArrayWithURLStringArray:center.boldFontURLStringArray]];
+    [center.boldFontModelArray setArray:[self assembleModelArrayWithURLStringArray:center.boldFontURLStringArray
+                                                                              type:FYFontTypeBoldFont]];
 }
 
 + (void)setItalicFontURLStringArray:(NSArray<NSString *> *)URLStringArray{
     FYFontModelCenter *center = [FYFontModelCenter defaultCenter];
     center.italicFontURLStringArray = URLStringArray;
-    [center.italicFontModelArray setArray:[self assembleModelArrayWithURLStringArray:center.italicFontURLStringArray]];
+    [center.italicFontModelArray setArray:[self assembleModelArrayWithURLStringArray:center.italicFontURLStringArray
+                                                                                type:FYFontTypeItalicFont]];
 }
 
 + (NSMutableArray<FYFontModel *> *)fontModelArray {
