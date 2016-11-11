@@ -33,12 +33,12 @@ static const CGFloat StripeWidth = 20.0f;
 - (void)layoutSubviews {
     [super layoutSubviews];
     if (self.downloadProgress == 1.0f) {
-        [self.stripesLayer removeFromSuperlayer];
-        [self.progressLayer removeFromSuperlayer];
+        [_stripesLayer removeFromSuperlayer];
+        [_progressLayer removeFromSuperlayer];
         return;
     }
     if (self.striped) {
-        [self.progressLayer removeFromSuperlayer];
+        [_progressLayer removeFromSuperlayer];
         [self.layer addSublayer:self.stripesLayer];
         if (self.pauseStripes) {
             [self pauseLayer:self.stripesLayer];
@@ -46,10 +46,8 @@ static const CGFloat StripeWidth = 20.0f;
             [self resumeLayer:self.stripesLayer];
         }
     } else {
-        [self.stripesLayer removeFromSuperlayer];
+        [_stripesLayer removeFromSuperlayer];
         [self.layer addSublayer:self.progressLayer];
-        NSLog(@"%@ %@", self, self.progressLayer.path);
-        self.progressLayer.timeOffset = self.downloadProgress;
     }
 }
 
@@ -80,6 +78,7 @@ static const CGFloat StripeWidth = 20.0f;
     CFTimeInterval pausedTime = [layer timeOffset];
     layer.speed = 1.0f;
     layer.timeOffset = 0.0f;
+    layer.beginTime = 0.0;
     CFTimeInterval timeSincePause = [layer convertTime:CACurrentMediaTime() fromLayer:nil] - pausedTime;
     layer.beginTime = timeSincePause;
 }
@@ -144,18 +143,19 @@ static const CGFloat StripeWidth = 20.0f;
         _progressLayer.path = [UIBezierPath bezierPathWithRect:self.bounds].CGPath;
         _progressLayer.opacity = 0.5f;
         _progressLayer.speed = 0.0f;
-        
-        CABasicAnimation *progressAnimation = [CABasicAnimation animationWithKeyPath:@"path"];
-        progressAnimation.duration = 1.0f;
-        progressAnimation.removedOnCompletion = NO;
-        CGRect frame = self.bounds;
-        progressAnimation.fromValue = (__bridge id _Nullable)([UIBezierPath bezierPathWithRect:frame].CGPath);
-        frame.origin.x = self.bounds.size.width;
-        frame.size.width = 0.0f;
-        progressAnimation.toValue = (__bridge id _Nullable)([UIBezierPath bezierPathWithRect:frame].CGPath);
-        [_progressLayer addAnimation:progressAnimation forKey:@"progressAnimation"];
     }
     return _progressLayer;
+}
+
+- (void)setDownloadProgress:(double)downloadProgress {
+    if (_downloadProgress != downloadProgress) {
+        _downloadProgress = downloadProgress;
+        CGRect frame = self.bounds;
+        CGFloat width = frame.size.width;
+        frame.origin.x = width * downloadProgress;
+        frame.size.width =  width * (1.0f - downloadProgress);
+        _progressLayer.path = [UIBezierPath bezierPathWithRect:frame].CGPath;
+    }
 }
 
 @end

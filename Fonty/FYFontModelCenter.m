@@ -127,6 +127,12 @@
     return nil;
 }
 
++ (NSUInteger)indexOfModel:(FYFontModel *)model {
+    FYFontModelCenter *center = [FYFontModelCenter defaultCenter];
+    NSMutableArray<FYFontModel *> *fontModelArray = center.fontModelContainer[model.type];
+    return [fontModelArray indexOfObject:model];
+}
+
 #pragma mark - Accessor
 
 

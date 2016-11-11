@@ -23,26 +23,31 @@
 
 @implementation FYSelectFontViewController
 
+- (instancetype)initWithStyle:(UITableViewStyle)style {
+    self = [super initWithStyle:style];
+    if (!self) {
+        return nil;
+    }
+    self.clearsSelectionOnViewWillAppear = NO;
+    self.navigationItem.title = @"Fonty";
+    [self setupBarItems];
+    
+    _fontArrayContainer = @[FYFontManager.fontModelArray,
+                            FYFontManager.boldFontModelArray,
+                            FYFontManager.italicFontModelArray];
+    _sectionHeaderTitleArray = @[@"FONT",
+                                 @"BOLD FONT",
+                                 @"ITALIC FONT"];
+    return self;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.clearsSelectionOnViewWillAppear = NO;
     
+    self.navigationController.toolbarHidden = NO;
     self.tableView.allowsMultipleSelectionDuringEditing = YES;
     self.tableView.allowsMultipleSelection = YES;
-    
-    self.navigationItem.title = @"Fonty";
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Hide"
-                                                                              style:UIBarButtonItemStyleDone
-                                                                             target:self
-                                                                             action:@selector(backAction)];
-    
     [self.tableView registerClass:[FYSelectFontTableViewCell class] forCellReuseIdentifier:@"FYSelectFontTableViewCell"];
-    self.fontArrayContainer = @[FYFontManager.fontModelArray,
-                                FYFontManager.boldFontModelArray,
-                                FYFontManager.italicFontModelArray];
-    self.sectionHeaderTitleArray = @[@"FONT",
-                                     @"BOLD FONT",
-                                     @"ITALIC FONT"];
     [self setupSelection];
 }
 
@@ -61,6 +66,7 @@
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [FYFontManager saveSettins];
 }
 
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
@@ -184,23 +190,53 @@
     NSArray<FYFontModel *> *targetFontArray = self.fontArrayContainer[targetSection];
     NSInteger targetRow = [targetFontArray indexOfObject:newModel];
     
-    for (NSIndexPath *indexPath in self.tableView.indexPathsForVisibleRows) {
-        if (indexPath.section == targetSection && indexPath.row == targetRow) {
-            FYSelectFontTableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
-            [self assembleCell:cell withModel:newModel];
-            [cell setNeedsLayout];
-            break;
+    if (newModel.status == FYFontModelDownloadStatusToBeDownloaded) {
+        [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:targetRow inSection:targetSection]]
+                              withRowAnimation:UITableViewRowAnimationNone];
+        [self setupSelection];
+    } else {
+        // "Reloading a row causes the table view to ask its data source for a new cell for that row. " --> upset the downloading animation
+        for (NSIndexPath *indexPath in self.tableView.indexPathsForVisibleRows) {
+            if (indexPath.section == targetSection && indexPath.row == targetRow) {
+                FYSelectFontTableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
+                [self assembleCell:cell withModel:newModel];
+                [cell setNeedsLayout];
+                break;
+            }
         }
     }
 }
 
 #pragma mark - Action 
 
+- (void)switchChangeValue:(UISwitch *)sw {
+    FYFontManager.usingFontyStyle = sw.isOn;
+}
+
 - (void)backAction {
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - Private
+
+- (void)setupBarItems {
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Hide"
+                                                                              style:UIBarButtonItemStyleDone
+                                                                             target:self
+                                                                             action:@selector(backAction)];
+    
+    UISwitch *styleSwitch = [[UISwitch alloc] init];
+    [styleSwitch setOn:FYFontManager.isUsingFontyStyle];
+    [styleSwitch addTarget:self action:@selector(switchChangeValue:) forControlEvents:UIControlEventValueChanged];
+    UIBarButtonItem *bbi = [[UIBarButtonItem alloc] initWithCustomView:styleSwitch];
+    [bbi setPossibleTitles:[NSSet setWithObject:@"possibleTitles"]];
+    self.toolbarItems = @[[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:NULL],
+                          [[UIBarButtonItem alloc] initWithTitle:@"Use Fonty Style ->"
+                                                           style:UIBarButtonItemStylePlain
+                                                          target:nil
+                                                          action:NULL],
+                          [[UIBarButtonItem alloc] initWithCustomView:styleSwitch]];
+}
 
 - (void)setupSelection {
     if (FYFontManager.fontModelArray.count) {

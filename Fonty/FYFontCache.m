@@ -53,7 +53,8 @@ static NSString * const FTFontCacheDirectoryName = @"FTFont";
     NSString *cachePath = [self.diskCacheDirectoryPath stringByAppendingPathComponent:cacheFileName];
     NSData *cacheData = [NSData dataWithContentsOfFile:cachePath];
     if (cacheData) {
-        return [NSKeyedUnarchiver unarchiveObjectWithData:cacheData];
+        id obj = [NSKeyedUnarchiver unarchiveObjectWithData:cacheData];
+        return obj;
     } else {
         return nil;
     }

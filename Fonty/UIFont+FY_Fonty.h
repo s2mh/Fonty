@@ -10,7 +10,11 @@
 #import "FYFontManager.h"
 
 @interface UIFont (FY_Fonty)
+
 + (UIFont *)fy_mainFontOfSize:(CGFloat)size;
++ (UIFont *)fy_mainBoldFontOfSize:(CGFloat)size;
++ (UIFont *)fy_mainItalicFontOfSize:(CGFloat)size;
+
 + (UIFont *)fy_fontWithURL:(NSURL *)URL size:(CGFloat)size;
 + (UIFont *)fy_fontWithURLString:(NSString *)URLString size:(CGFloat)size;
 

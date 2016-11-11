@@ -7,33 +7,93 @@
 //
 
 #import "ViewController.h"
+#import <objc/message.h>
 #import "FYSelectFontViewController.h"
 #import "FYHeader.h"
 
+static const CGFloat FontSize = 17.0f;
+
 @interface ViewController ()
 
-@property (weak, nonatomic) IBOutlet UILabel *label;
-@property (weak, nonatomic) IBOutlet UITextField *textField;
+//@property (weak, nonatomic) IBOutlet UILabel *label;
+//@property (weak, nonatomic) IBOutlet UITextField *textField;
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
+
+@property (nonatomic, strong) NSArray<NSString *> *sectionHeaderTitleArray;
+
+@property (strong, nonatomic) NSArray<NSString *> *UIFontSelectorStringArray;
+@property (strong, nonatomic) NSArray<NSString *> *UIFontCategorySelectorStringArray;
+@property (strong, nonatomic) NSArray<NSString *> *FYFontManagerSelectorStringArray;
+
+@property (strong, nonatomic) NSArray<NSArray *> *arrayContainer;
 
 @end
 
 @implementation ViewController
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
+- (void)awakeFromNib {
+    [super awakeFromNib];
+    self.arrayContainer = @[self.UIFontSelectorStringArray = @[@"systemFontOfSize:",
+                                                               @"boldSystemFontOfSize:",
+                                                               @"italicSystemFontOfSize:"],
+                            self.UIFontCategorySelectorStringArray = @[@"fy_mainFontOfSize:",
+                                                                       @"fy_mainBoldFontOfSize:",
+                                                                       @"fy_mainItalicFontOfSize:"],
+                            self.FYFontManagerSelectorStringArray = @[@"mainFontOfSize:",
+                                                                      @"mainBoldFontOfSize:",
+                                                                      @"mainItalicFontOfSize:",
+                                                                      @"UIFontSystemFontOfSize:",
+                                                                      @"UIFontBoldSystemFontOfSize:",
+                                                                      @"UIFontItalicSystemFontOfSize:"]];
+    
+    
+    self.sectionHeaderTitleArray = @[@"UIFont",
+                                     @"UIFont (FY_Fonty)",
+                                     @"FYFontManager"];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    [self.label setFont:[UIFont systemFontOfSize:24.0f]];
-//    [self.textField setFont:[UIFont fy_mainFontOfSize:24.0f]];
-    [self.textField setFont:[UIFont boldSystemFontOfSize:24.0f]];
-    [self.textField becomeFirstResponder];
+    [self.tableView reloadData];
 }
 
+#pragma mark - UITableViewDataSource
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return self.arrayContainer.count;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return self.arrayContainer[section].count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSArray<NSString *> *selectStringArray = self.arrayContainer[indexPath.section];
+    NSString *selectorString = selectStringArray[indexPath.row];
+    SEL selector = NSSelectorFromString(selectorString);
+    id reciever = nil;
+    if (selectStringArray == self.FYFontManagerSelectorStringArray) {
+        reciever = (id)[FYFontManager class];
+    } else {
+        reciever = (id)[UIFont class];
+    }
+    UIFont *font = ((UIFont *(*)(id, SEL, CGFloat)) objc_msgSend)(reciever, selector, FontSize);
+    
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"UITableViewCell" forIndexPath:indexPath];
+    cell.textLabel.font = font;
+    cell.textLabel.text = [NSString stringWithFormat:@"%@ 是这样的", selectorString];
+    return cell;
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    return self.sectionHeaderTitleArray[section];
+}
+
+#pragma mark - Action
+
 - (IBAction)barButtonItemAction:(UIBarButtonItem *)sender {
-    FYSelectFontViewController *vc = [[FYSelectFontViewController alloc] init];
+    FYSelectFontViewController *vc = [[FYSelectFontViewController alloc] initWithStyle:UITableViewStyleGrouped];
     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:vc];
     [self presentViewController:nc animated:YES completion:nil];
 }

@@ -20,5 +20,6 @@
 + (NSMutableArray<FYFontModel *> *)italicFontModelArray;
 
 + (FYFontModel *)fontModelWithURLString:(NSString *)URLString;
++ (NSUInteger)indexOfModel:(FYFontModel *)model;
 
 @end
