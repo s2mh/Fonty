@@ -20,7 +20,7 @@
     return instance;
 }
 
-- (NSString *)registerFontWithPath:(NSString *)path completeBlock:(void(^)(NSString *))completeBlock {
+- (NSString *)registerFontWithPath:(NSString *)path {
     NSString *postScriptName = nil;
     NSURL *fontUrl = [NSURL fileURLWithPath:path];
     CGDataProviderRef fontDataProvider = CGDataProviderCreateWithURL((__bridge CFURLRef)fontUrl);
@@ -28,9 +28,6 @@
     if (fontRef) {
         CTFontManagerRegisterGraphicsFont(fontRef, NULL);
         postScriptName = CFBridgingRelease(CGFontCopyPostScriptName(fontRef));
-        if (postScriptName && completeBlock) {
-            completeBlock(postScriptName);
-        }
     }
     CGFontRelease(fontRef);
     return postScriptName;

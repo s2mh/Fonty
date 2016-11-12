@@ -47,9 +47,9 @@ static const CGFloat FontSize = 17.0f;
                                                                       @"UIFontItalicSystemFontOfSize:"]];
     
     
-    self.sectionHeaderTitleArray = @[@"UIFont",
-                                     @"UIFont (FY_Fonty)",
-                                     @"FYFontManager"];
+    self.sectionHeaderTitleArray = @[@"UIFont Selectors",
+                                     @"UIFont (FY_Fonty) Selectors",
+                                     @"FYFontManager Selectors"];
 }
 
 - (void)viewWillAppear:(BOOL)animated {

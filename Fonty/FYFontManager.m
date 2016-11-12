@@ -7,6 +7,7 @@
 //
 
 #import <objc/runtime.h>
+#import <objc/message.h>
 
 #import "FYFontManager.h"
 #import "FYFontCache.h"
@@ -18,14 +19,14 @@
 
 static NSString *const FYFontSharedManager = @"FYFontSharedManager";
 
-@interface FYFontManager ()
-
-@property (nonatomic, strong, class) NSMutableDictionary<NSString *, NSString *> *postScriptNames; // key = URL.absoluteString, object = postScriptName
+@interface FYFontManager () <NSCoding>
 
 @property (nonatomic, assign) NSUInteger sharedMainFontIndex;
 @property (nonatomic, assign) NSUInteger sharedMainBoldFontIndex;
 @property (nonatomic, assign) NSUInteger sharedMainItalicFontIndex;
-@property (nonatomic, strong) NSMutableDictionary<NSString *, NSString *> *sharedPostScriptNames;
+@property (nonatomic, strong) NSMutableDictionary<NSString *, NSString *> *sharedPostScriptNames; // key = URL.absoluteString, object = postScriptName
+
+@property (nonatomic, assign) BOOL sharedUsingFontyStyle;
 
 @end
 
@@ -35,46 +36,8 @@ static NSString *const FYFontSharedManager = @"FYFontSharedManager";
 {
     if (self == [FYFontManager class]) {
         [self setup];
+        ((void(*)(id, SEL))objc_msgSend)(self, NSSelectorFromString(@"checkStyle"));
     }
-}
-
-- (instancetype)init
-{
-    self = [super init];
-    if (self) {
-        _sharedMainFontIndex = 0;
-        _sharedMainBoldFontIndex = 0;
-        _sharedMainItalicFontIndex = 0;
-        _sharedPostScriptNames = [NSMutableDictionary dictionary];
-    }
-    return self;
-}
-
-- (id)initWithCoder:(NSCoder *)decoder {
-    self = [super init];
-    if (!self) {
-        return nil;
-    }
-    self.sharedMainFontIndex       = [decoder decodeIntegerForKey:@"sharedMainFontIndex"];
-    self.sharedMainBoldFontIndex   = [decoder decodeIntegerForKey:@"sharedMainBoldFontIndex"];
-    self.sharedMainItalicFontIndex = [decoder decodeIntegerForKey:@"sharedMainItalicFontIndex"];
-    self.sharedPostScriptNames     = [decoder decodeObjectForKey:@"sharedPostScriptNames"];
-    [[self.sharedPostScriptNames allKeys] enumerateObjectsUsingBlock:^(NSString * _Nonnull URLString, NSUInteger idx, BOOL * _Nonnull stop) {
-        NSLog(@"URLString %@", URLString);
-        [self.sharedPostScriptNames setObject:[decoder decodeObjectForKey:URLString] forKey:URLString];
-    }];
-    
-    return self;
-}
-
-- (void)encodeWithCoder:(NSCoder *)encoder {
-    [encoder encodeInteger:self.sharedMainFontIndex       forKey:@"sharedMainFontIndex"];
-    [encoder encodeInteger:self.sharedMainBoldFontIndex   forKey:@"sharedMainBoldFontIndex"];
-    [encoder encodeInteger:self.sharedMainItalicFontIndex forKey:@"sharedMainItalicFontIndex"];
-    [encoder encodeObject:self.sharedPostScriptNames      forKey:@"sharedPostScriptNames"];
-     [self.sharedPostScriptNames enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull URLString, NSString * _Nonnull postScriptName, BOOL * _Nonnull stop) {
-        [encoder encodeObject:postScriptName forKey:URLString];
-    }];
 }
 
 + (instancetype)sharedManager {
@@ -123,7 +86,7 @@ static NSString *const FYFontSharedManager = @"FYFontSharedManager";
                         }
                         break;
                 }
-                [FYFontManager.postScriptNames removeObjectForKey:model.downloadURL.absoluteString];
+                [[[FYFontManager sharedManager] sharedPostScriptNames] removeObjectForKey:model.downloadURL.absoluteString];
                 model.downloadProgress = 0.0f;
                 model.fileDownloadedSize = 0;
                 model.status = FYFontModelDownloadStatusToBeDownloaded;
@@ -149,6 +112,39 @@ static NSString *const FYFontSharedManager = @"FYFontSharedManager";
     };    
 }
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        _sharedMainFontIndex = 0;
+        _sharedMainBoldFontIndex = 0;
+        _sharedMainItalicFontIndex = 0;
+        _sharedPostScriptNames = [NSMutableDictionary dictionary];
+    }
+    return self;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)decoder {
+    self = [super init];
+    if (!self) {
+        return nil;
+    }
+    self.sharedMainFontIndex       = [decoder decodeIntegerForKey:@"sharedMainFontIndex"];
+    self.sharedMainBoldFontIndex   = [decoder decodeIntegerForKey:@"sharedMainBoldFontIndex"];
+    self.sharedMainItalicFontIndex = [decoder decodeIntegerForKey:@"sharedMainItalicFontIndex"];
+    self.sharedPostScriptNames     = [decoder decodeObjectForKey:@"sharedPostScriptNames"];
+    self.sharedUsingFontyStyle     = [decoder decodeBoolForKey:@"sharedUsingFontyStyle"];
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)encoder {
+    [encoder encodeInteger:self.sharedMainFontIndex       forKey:@"sharedMainFontIndex"];
+    [encoder encodeInteger:self.sharedMainBoldFontIndex   forKey:@"sharedMainBoldFontIndex"];
+    [encoder encodeInteger:self.sharedMainItalicFontIndex forKey:@"sharedMainItalicFontIndex"];
+    [encoder encodeObject:self.sharedPostScriptNames      forKey:@"sharedPostScriptNames"];
+    [encoder encodeBool:self.sharedUsingFontyStyle        forKey:@"sharedUsingFontyStyle"];
+}
+
 #pragma mark - Private
 
 + (void)postNotificationWithModel:(FYFontModel *)model {
@@ -167,26 +163,21 @@ static NSString *const FYFontSharedManager = @"FYFontSharedManager";
     if (![URL isKindOfClass:NSURL.class]) {
         return [self UIFontSystemFontOfSize:size];
     }
-    NSString *postScriptName = [FYFontManager.postScriptNames objectForKey:URL.absoluteString];
+    NSMutableDictionary *sharedPostScriptNames = [[FYFontManager sharedManager] sharedPostScriptNames];
+    NSString *postScriptName = [sharedPostScriptNames objectForKey:URL.absoluteString];
     UIFont *font = [UIFont fontWithName:postScriptName size:size];
-    
     if (![font.fontName isEqualToString:postScriptName]) {
-        if (!postScriptName) {
-            // retrieve postScriptName in cache
-            NSString *cachePath = [[FYFontCache sharedFontCache] cachedFilePathWithDownloadURL:URL];
-            if (cachePath) {
-                postScriptName = [[FYFontRegister sharedRegister] registerFontWithPath:cachePath completeBlock:^(NSString *registeredPostScriptName){
-                    [FYFontManager.postScriptNames setObject:registeredPostScriptName forKey:URL.absoluteString];
-                    FYFontModel *model = [FYFontModelCenter fontModelWithURLString:URL.absoluteString];
-                    if (model) {
-                        model.postScriptName = registeredPostScriptName;
-                    }
-                }];
+        NSString *cachePath = [[FYFontCache sharedFontCache] cachedFilePathWithDownloadURL:URL];
+        if (cachePath) {
+            postScriptName = [[FYFontRegister sharedRegister] registerFontWithPath:cachePath];
+            if (postScriptName) {
+                font = [UIFont fontWithName:postScriptName size:size];
+                [sharedPostScriptNames setObject:postScriptName forKey:URL.absoluteString];
+                FYFontModel *model = [FYFontModelCenter fontModelWithURLString:URL.absoluteString];
+                if (model) {
+                    model.postScriptName = postScriptName;
+                }
             }
-        }
-        if (postScriptName) {
-            // found postScriptName
-            font = [UIFont fontWithName:postScriptName size:size];
         }
     }
     return font;
@@ -298,15 +289,6 @@ static NSString *const FYFontSharedManager = @"FYFontSharedManager";
     return FYFontModelCenter.italicFontModelArray;
 }
 
-
-+ (void)setPostScriptNames:(NSMutableDictionary<NSString *, NSString *> *)postScriptNames {
-    [[FYFontManager sharedManager] setSharedPostScriptNames:postScriptNames];
-}
-
-+ (NSMutableDictionary<NSString *, NSString *> *)postScriptNames {
-    return [[FYFontManager sharedManager] sharedPostScriptNames];
-}
-
 + (void)setMainFontIndex:(NSUInteger)mainFontIndex {
     [[FYFontManager sharedManager] setSharedMainFontIndex:mainFontIndex];
 }
@@ -337,24 +319,22 @@ static IMP __UIFont_systemFontOfSize_method_imp;
 static IMP __UIFont_boldSystemFontOfSize_method_imp;
 static IMP __UIFont_italicSystemFontOfSize_method_imp;
 
-static inline UIFont *_FY_systemFontOfSize_function(id self, SEL _cmd, CGFloat size)
+static inline UIFont *_FY_mainFontOfSize_function(id self, SEL _cmd, CGFloat size)
 {
     return [FYFontManager mainFontOfSize:size];
 }
 
-static inline UIFont *_FY_boldSystemFontOfSize_function(id self, SEL _cmd, CGFloat size)
+static inline UIFont *_FY_mainBoldFontOfSize_function(id self, SEL _cmd, CGFloat size)
 {
     return [FYFontManager mainBoldFontOfSize:size];
 }
 
-static inline UIFont *_FY_italicSystemFontOfSize_function(id self, SEL _cmd, CGFloat size)
+static inline UIFont *_FY_mainItalicFontOfSize_function(id self, SEL _cmd, CGFloat size)
 {
     return [FYFontManager mainItalicFontOfSize:size];
 }
 
 @implementation FYFontManager (Style)
-
-static const void *FYUsingFontyStyleKey;
 
 #pragma mark - Public
 
@@ -385,28 +365,32 @@ static const void *FYUsingFontyStyleKey;
 #pragma mark - Accessor
 
 + (void)setUsingFontyStyle:(BOOL)usingFontyStyle {
-    if (usingFontyStyle) {
+    [FYFontManager sharedManager].sharedUsingFontyStyle = usingFontyStyle;
+    [self checkStyle];
+}
+
++ (BOOL)isUsingFontyStyle {
+    return [FYFontManager sharedManager].sharedUsingFontyStyle;
+}
+
+#pragma mark - Private
+
++ (void)checkStyle {
+    if (self.isUsingFontyStyle) {
         [self useFontyStyle];
     } else {
         [self useUIFontStyle];
     }
-    objc_setAssociatedObject(self, FYUsingFontyStyleKey, @(usingFontyStyle), OBJC_ASSOCIATION_ASSIGN);
 }
-
-+ (BOOL)isUsingFontyStyle {
-    return [objc_getAssociatedObject(self, FYUsingFontyStyleKey) boolValue];
-}
-
-#pragma mark - Private
 
 + (void)useFontyStyle {
     Method systemFontOfSizeMethod       = class_getClassMethod([UIFont class], @selector(systemFontOfSize:));
     Method boldSystemFontOfSizeMethod   = class_getClassMethod([UIFont class], @selector(boldSystemFontOfSize:));
     Method italicSystemFontOfSizeMethod = class_getClassMethod([UIFont class], @selector(italicSystemFontOfSize:));
     
-    __UIFont_systemFontOfSize_method_imp       = method_setImplementation(systemFontOfSizeMethod,       (IMP)_FY_systemFontOfSize_function);
-    __UIFont_boldSystemFontOfSize_method_imp   = method_setImplementation(boldSystemFontOfSizeMethod,   (IMP)_FY_boldSystemFontOfSize_function);
-    __UIFont_italicSystemFontOfSize_method_imp = method_setImplementation(italicSystemFontOfSizeMethod, (IMP)_FY_italicSystemFontOfSize_function);
+    __UIFont_systemFontOfSize_method_imp       = method_setImplementation(systemFontOfSizeMethod,       (IMP)_FY_mainFontOfSize_function);
+    __UIFont_boldSystemFontOfSize_method_imp   = method_setImplementation(boldSystemFontOfSizeMethod,   (IMP)_FY_mainBoldFontOfSize_function);
+    __UIFont_italicSystemFontOfSize_method_imp = method_setImplementation(italicSystemFontOfSizeMethod, (IMP)_FY_mainItalicFontOfSize_function);
 }
 
 + (void)useUIFontStyle {

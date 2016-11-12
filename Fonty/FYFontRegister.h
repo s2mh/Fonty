@@ -12,7 +12,7 @@
 
 + (instancetype)sharedRegister;
 
-- (NSString *)registerFontWithPath:(NSString *)path completeBlock:(void(^)(NSString *registeredPostScriptName))completeBlock;
+- (NSString *)registerFontWithPath:(NSString *)path;
 - (void)unregisterFontWithPath:(NSString *)path completeBlock:(void(^)())completeBlock;
 
 @end

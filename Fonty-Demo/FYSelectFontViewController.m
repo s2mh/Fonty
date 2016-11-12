@@ -231,7 +231,7 @@
     UIBarButtonItem *bbi = [[UIBarButtonItem alloc] initWithCustomView:styleSwitch];
     [bbi setPossibleTitles:[NSSet setWithObject:@"possibleTitles"]];
     self.toolbarItems = @[[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:NULL],
-                          [[UIBarButtonItem alloc] initWithTitle:@"Use Fonty Style ->"
+                          [[UIBarButtonItem alloc] initWithTitle:@"Fonty Style Switch ->"
                                                            style:UIBarButtonItemStylePlain
                                                           target:nil
                                                           action:NULL],
