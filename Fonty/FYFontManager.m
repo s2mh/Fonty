@@ -13,8 +13,6 @@
 #import "FYFontCache.h"
 #import "FYFontRegister.h"
 #import "FYFontDownloader.h"
-#import "FYFontModel.h"
-#import "FYConst.h"
 #import "FYFontModelCenter.h"
 
 static NSString *const FYFontSharedManager = @"FYFontSharedManager";

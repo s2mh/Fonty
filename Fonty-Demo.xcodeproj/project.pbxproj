@@ -46,7 +46,6 @@
 		6A73D6E21D86C05000D38630 /* FYFontModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FYFontModel.m; sourceTree = "<group>"; };
 		6A73D6E31D86C05000D38630 /* FYFontRegister.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FYFontRegister.h; sourceTree = "<group>"; };
 		6A73D6E41D86C05000D38630 /* FYFontRegister.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FYFontRegister.m; sourceTree = "<group>"; };
-		6A73D6E51D86C05000D38630 /* FYHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FYHeader.h; sourceTree = "<group>"; };
 		6A73D6E61D86C05000D38630 /* UIFont+FY_Fonty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIFont+FY_Fonty.h"; sourceTree = "<group>"; };
 		6A73D6E71D86C05000D38630 /* UIFont+FY_Fonty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIFont+FY_Fonty.m"; sourceTree = "<group>"; };
 		6A73D6EE1D86C09500D38630 /* FYSelectFontViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FYSelectFontViewController.h; sourceTree = "<group>"; };
@@ -118,7 +117,6 @@
 		6A73D6DA1D86C05000D38630 /* Fonty */ = {
 			isa = PBXGroup;
 			children = (
-				6A73D6E51D86C05000D38630 /* FYHeader.h */,
 				6A8DD33F1D880322005C6E8E /* FYConst.h */,
 				6A8DD3401D880335005C6E8E /* FYConst.m */,
 				6A73D6DF1D86C05000D38630 /* FYFontManager.h */,

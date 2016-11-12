@@ -9,6 +9,9 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
+#import "FYFontModel.h"
+#import "FYConst.h"
+
 @class FYFontModel;
 
 @interface FYFontManager : NSObject

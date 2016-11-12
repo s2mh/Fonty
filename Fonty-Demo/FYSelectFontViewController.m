@@ -10,7 +10,7 @@
 
 #import "FYSelectFontTableViewCell.h"
 
-#import "FYHeader.h"
+#import "FYFontManager.h"
 #import "UIFont+FY_Fonty.h"
 
 @interface FYSelectFontViewController ()

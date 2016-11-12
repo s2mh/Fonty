@@ -9,14 +9,12 @@
 #import "ViewController.h"
 #import <objc/message.h>
 #import "FYSelectFontViewController.h"
-#import "FYHeader.h"
+#import "FYFontManager.h"
 
 static const CGFloat FontSize = 17.0f;
 
 @interface ViewController ()
 
-//@property (weak, nonatomic) IBOutlet UILabel *label;
-//@property (weak, nonatomic) IBOutlet UITextField *textField;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 
 @property (nonatomic, strong) NSArray<NSString *> *sectionHeaderTitleArray;
