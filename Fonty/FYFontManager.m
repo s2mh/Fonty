@@ -22,7 +22,7 @@ static NSString *const FYFontSharedManager = @"FYFontSharedManager";
 @property (nonatomic, assign) NSUInteger sharedMainFontIndex;
 @property (nonatomic, assign) NSUInteger sharedMainBoldFontIndex;
 @property (nonatomic, assign) NSUInteger sharedMainItalicFontIndex;
-@property (nonatomic, strong) NSMutableDictionary<NSString *, NSString *> *sharedPostScriptNames; // key = URL.absoluteString, object = postScriptName
+@property (nonatomic, strong) NSMutableDictionary<NSURL *, NSString *> *sharedPostScriptNames; // key = URL, object = postScriptName
 
 @property (nonatomic, assign) BOOL sharedUsingFontyStyle;
 
@@ -84,7 +84,7 @@ static NSString *const FYFontSharedManager = @"FYFontSharedManager";
                         }
                         break;
                 }
-                [[[FYFontManager sharedManager] sharedPostScriptNames] removeObjectForKey:model.downloadURL.absoluteString];
+                [[[FYFontManager sharedManager] sharedPostScriptNames] removeObjectForKey:model.downloadURL];
                 model.downloadProgress = 0.0f;
                 model.fileDownloadedSize = 0;
                 model.status = FYFontModelDownloadStatusToBeDownloaded;
@@ -162,7 +162,7 @@ static NSString *const FYFontSharedManager = @"FYFontSharedManager";
         return [self UIFontSystemFontOfSize:size];
     }
     NSMutableDictionary *sharedPostScriptNames = [[FYFontManager sharedManager] sharedPostScriptNames];
-    NSString *postScriptName = [sharedPostScriptNames objectForKey:URL.absoluteString];
+    NSString *postScriptName = [sharedPostScriptNames objectForKey:URL];
     UIFont *font = [UIFont fontWithName:postScriptName size:size];
     if (![font.fontName isEqualToString:postScriptName]) {
         NSString *cachePath = [[FYFontCache sharedFontCache] cachedFilePathWithDownloadURL:URL];
@@ -170,7 +170,7 @@ static NSString *const FYFontSharedManager = @"FYFontSharedManager";
             postScriptName = [[FYFontRegister sharedRegister] registerFontWithPath:cachePath];
             if (postScriptName) {
                 font = [UIFont fontWithName:postScriptName size:size];
-                [sharedPostScriptNames setObject:postScriptName forKey:URL.absoluteString];
+                [sharedPostScriptNames setObject:postScriptName forKey:URL];
                 FYFontModel *model = [FYFontModelCenter fontModelWithURLString:URL.absoluteString];
                 if (model) {
                     model.postScriptName = postScriptName;
@@ -237,9 +237,8 @@ static NSString *const FYFontSharedManager = @"FYFontSharedManager";
     }
     if ([URL isKindOfClass:[NSURL class]]) {
         NSString *cachePath = [[FYFontCache sharedFontCache] cachedFilePathWithDownloadURL:URL];
-        [[FYFontRegister sharedRegister] unregisterFontWithPath:cachePath completeBlock:^{
-            [[FYFontCache sharedFontCache] cleanCachedFileWithDownloadURL:URL];
-        }];
+        [[FYFontRegister sharedRegister] unregisterFontWithPath:cachePath];
+        [[FYFontCache sharedFontCache] cleanCachedFileWithDownloadURL:URL];
     }
 }
 

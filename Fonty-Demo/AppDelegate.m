@@ -17,11 +17,11 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     
-    [FYFontManager setFontURLStringArray:@[@"http://115.28.28.235:8088/SizeKnownFont.ttf",
+    [FYFontManager setFontURLStringArray:@[@"https://github.com/s2mh/Fonty/raw/master/FontFiles/SizeKnownFont.ttf",
                                            @"http://115.28.28.235:8088/SizeUnknownFont.ttf"]];
-    [FYFontManager setBoldFontURLStringArray:@[@"http://115.28.28.235:8088/SizeKnownBoldFont.ttf",
+    [FYFontManager setBoldFontURLStringArray:@[@"https://github.com/s2mh/Fonty/raw/master/FontFiles/SizeKnownBoldFont.ttf",
                                                @"http://115.28.28.235:8088/SizeUnknownBoldFont.otf"]];
-    [FYFontManager setItalicFontURLStringArray:@[]];
+    [FYFontManager setItalicFontURLStringArray:@[@"https://github.com/s2mh/Fonty/raw/master/FontFiles/SizeKnowItalicFont.ttf"]];
     return YES;
 }
 

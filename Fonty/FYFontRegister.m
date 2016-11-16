@@ -22,28 +22,27 @@
 
 - (NSString *)registerFontWithPath:(NSString *)path {
     NSString *postScriptName = nil;
-    NSURL *fontUrl = [NSURL fileURLWithPath:path];
-    CGDataProviderRef fontDataProvider = CGDataProviderCreateWithURL((__bridge CFURLRef)fontUrl);
+    NSURL *fontURL = [NSURL fileURLWithPath:path];
+    CGDataProviderRef fontDataProvider = CGDataProviderCreateWithURL((__bridge CFURLRef)fontURL);
     CGFontRef fontRef = CGFontCreateWithDataProvider(fontDataProvider);
     if (fontRef) {
         CTFontManagerRegisterGraphicsFont(fontRef, NULL);
         postScriptName = CFBridgingRelease(CGFontCopyPostScriptName(fontRef));
+        CGFontRelease(fontRef);
     }
-    CGFontRelease(fontRef);
+    CGDataProviderRelease(fontDataProvider);
     return postScriptName;
 }
 
-- (void)unregisterFontWithPath:(NSString *)path completeBlock:(void(^)())completeBlock {
-    NSURL *fontUrl = [NSURL fileURLWithPath:path];
-    CGDataProviderRef fontDataProvider = CGDataProviderCreateWithURL((__bridge CFURLRef)fontUrl);
+- (void)unregisterFontWithPath:(NSString *)path {
+    NSURL *fontURL = [NSURL fileURLWithPath:path];
+    CGDataProviderRef fontDataProvider = CGDataProviderCreateWithURL((__bridge CFURLRef)fontURL);
     CGFontRef fontRef = CGFontCreateWithDataProvider(fontDataProvider);
     if (fontRef) {
         CTFontManagerUnregisterGraphicsFont(fontRef, NULL);
+        CGFontRelease(fontRef);
     }
-    CGFontRelease(fontRef);
-    if (completeBlock) {
-        completeBlock();
-    }
+    CGDataProviderRelease(fontDataProvider);
 }
 
 @end

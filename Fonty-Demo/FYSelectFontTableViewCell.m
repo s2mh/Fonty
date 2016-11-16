@@ -26,6 +26,7 @@ static const CGFloat StripeWidth = 20.0f;
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         _striped = NO;
         _pauseStripes = NO;
+        self.textLabel.lineBreakMode = NSLineBreakByTruncatingMiddle;
     }
     return self;
 }

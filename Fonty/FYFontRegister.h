@@ -13,6 +13,6 @@
 + (instancetype)sharedRegister;
 
 - (NSString *)registerFontWithPath:(NSString *)path;
-- (void)unregisterFontWithPath:(NSString *)path completeBlock:(void(^)())completeBlock;
+- (void)unregisterFontWithPath:(NSString *)path;
 
 @end
