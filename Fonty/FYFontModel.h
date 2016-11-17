@@ -28,6 +28,7 @@ typedef NS_ENUM(NSUInteger, FYFontType) {
 @property (nonatomic, assign) FYFontModelDownloadStatus status;
 @property (nonatomic, assign) FYFontType type;
 
+// or CSS name
 @property (nonatomic, copy) NSString *postScriptName;
 
 @property (nonatomic, copy) NSURL *downloadURL;

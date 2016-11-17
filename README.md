@@ -5,6 +5,7 @@
 
 ## CocoaPods
 Podfile:
+
 ```ruby
 platform :ios, '7.0'
 

@@ -210,7 +210,7 @@
 #pragma mark - Action 
 
 - (void)switchChangeValue:(UISwitch *)sw {
-    FYFontManager.usingFontyStyle = sw.isOn;
+    FYFontManager.usingMainStyle = sw.isOn;
 }
 
 - (void)backAction {
@@ -226,7 +226,7 @@
                                                                              action:@selector(backAction)];
     
     UISwitch *styleSwitch = [[UISwitch alloc] init];
-    [styleSwitch setOn:FYFontManager.isUsingFontyStyle];
+    [styleSwitch setOn:FYFontManager.isUsingMainStyle];
     [styleSwitch addTarget:self action:@selector(switchChangeValue:) forControlEvents:UIControlEventValueChanged];
     UIBarButtonItem *bbi = [[UIBarButtonItem alloc] initWithCustomView:styleSwitch];
     [bbi setPossibleTitles:[NSSet setWithObject:@"possibleTitles"]];
