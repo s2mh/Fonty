@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
 
   s.name         = "Fonty"
   s.version      = "1.2.1"
-  s.summary      = "A Dynamic Font Tool For iOS Apps"
+  s.summary      = "A dynamic font framework for iOS."
 
   # This description is used to generate tags and improve search results.
   #   * Think: What does it do? Why did you write it? What is the focus?
