@@ -1,2 +1,5 @@
-nguage: objective-c
+language: objective-c
 osx_image: xcode8.0
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
