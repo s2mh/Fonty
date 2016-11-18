@@ -1,10 +1,43 @@
-## Fonty
-用来下载，缓存，注册和删除应用中的字体。
+#这是什么
 
-*Use it to download, cache, register and delete fonts in App.*
+这是一个处理iOS的自定义字体的开发框架。目前只有OC版本。
 
-## CocoaPods
-Podfile:
+#有什么功能
+
+该框架可以使应用在运行时动态地管理自定义字体，也可以用自定义字体替换系统内置的字体。
+
+#为什么做这个
+
+iOS系统内置有248种字体，但是其中简体汉字只有6种：
+![](https://github.com/s2mh/UIFontTesting/raw/master/Screenshot/PingFang%20SC.png)
+这六种字体都属于PingFang SC，它们除了粗细之外没有差别。这导致原生iOS应用中的简体汉字样式比较单调。韩语字体和日语字体也是如此。
+可以参考我的[测试demo](https://github.com/s2mh/UIFontTesting)。
+
+#这是如何实现的
+
+该框架的主要实现方案如下：
+
+  - 将字体文件下载并保存到应用的沙盒中。
+  - 使用CoreText框架，注册字体文件并获取字体的PostScript name。
+  - 使用UIFont的+fontWithName:size:方法获得字体。
+
+
+#如何使用它
+
+使用Fonty有两个原则，分别是*先下载后使用*和*一个URL对应一种字体*。
+
+##准备
+
+你要有你想使用的字体文件（ttf或otf格式的）。你可以在网上找，也可以自己制作并传到自己的网站或者服务器上。
+总之，你需要至少一个能用的字体文件的URL字符串。例如：
+
+```objective-c
+NSString *URLString = @"https://github.com/s2mh/Fonty/raw/master/FontFiles/SizeKnownFont.ttf";
+```
+
+##安装
+
+使用CocoaPods的工程，可以使用CocoaPods安装：
 
 ```ruby
 platform :ios, '7.0'
@@ -13,75 +46,162 @@ target 'TargetName' do
 pod 'Fonty'
 end
 ```
+没有使用CocoaPods的工程，可以直接将框架下的文件直接复制到工程目录下。
 
-## Usage
-## Get Font
+##获取字体
 
-#### 1."main font"
+Fonty是按照`门面模式`设计的，它的门面是`FYFontManager`。也就是说，框架的使用者主要使用的是`FYFontManager`。
 
-列举出你的字体文件所在的URL并设置一个主字体：
+###管理字体文件
 
-*List URL strings of your font files and set one as main font:*
+<a name="DownloadFontFile"></a>FYFontManager包含了开始，暂停和取消下载字体文件，以及删除已下载的字体文件的方法：
 
 ```objective-c
-#import "FYHeader.h"
++ (void)downloadFontWithURL:(NSURL *)URL;
++ (void)downloadFontWithURLString:(NSString *)URLString;
 
-FYFontManager *fontManager = [FYFontManager sharedManager];
++ (void)cancelDownloadingFontWithURL:(NSURL *)URL;
++ (void)cancelDownloadingFontWithURLString:(NSString *)URLString;
 
-fontManager.fontURLStringArray = @[@"http://115.28.28.235:8088/SizeKnownFont.ttf", 
-                                   @"http://115.28.28.235:8088/SizeUnknownFont.ttf"]; 
-                                                                                                                  
-fontManager.mainFontIndex = 1;
++ (void)pauseDownloadingWithURL:(NSURL *)URL;
++ (void)pauseDownloadingWithURLString:(NSString *)URLString;
+
++ (void)deleteFontWithURL:(NSURL *)URL;
++ (void)deleteFontWithURLString:(NSString *)URLString;
 ```
-    	
-用类别方法来获取主字体：
+注意在Fonty中`URLString == URL.absoluteString`。
 
-*Get main font by category method:*
+###获得字体
+
+`FYFontManager`提供了获得字体的方法：
+
+```objective-c
++ (UIFont *)fontWithURL:(NSURL *)URL size:(CGFloat)size;
++ (UIFont *)fontWithURLString:(NSString *)URLString size:(CGFloat)size;
+```
+为了方便起见，Fonty给UIFont添加了一个`FY_Fonty`类别。只需要加入头文件*UIFont+FY_Fonty.h*，即可使用其中的方法：
+
+```objective-c
++ (UIFont *)fy_fontWithURL:(NSURL *)URL size:(CGFloat)size;
++ (UIFont *)fy_fontWithURLString:(NSString *)URLString size:(CGFloat)size;
+```
+
+可以像这样使用：
 
 ```objective-c
 #import "UIFont+FY_Fonty.h"
-	
-UIFont *font = [UIFont fy_mainFontOfSize:24.0f];
+
+label.font = [UIFont fy_fontWithURL:downloadURL size:16.0f];
 ```
-    	
-#### 2. From URL
-用类别方法来获取URL中的字体：
 
-*Get font from URL by category method:*
+##管理多种字体
 
+Fonty可以同时管理多种字体。
+
+###导入字体数组
+
+把需要被Fonty管理的字体文件的URLString装在NSArray中，作为参数传给`FYFontManager`的这个方法：
 
 ```objective-c
-#import "UIFont+FY_Fonty.h"
-
-NSURL *URL = [NSURL URLWithString:@"http://115.28.28.235:8088/SizeUnknownFont.ttf"];
-UIFont *font = [UIFont fy_fontWithURL:URL size:24.0f];
++ (void)setFontURLStringArray:(NSArray<NSString *> *)fontURLStringArray;
 ```
 
-
-
-#### 3.PostScript name
-
-如果你知道该字体的`PostScript name`，那么直接使用`UIFont.h`的方法获得字体：
-
-*If you have got the PostScript name of the font, use the method in UIFont.h to get it:*
-
+建议在应用的AppDelegate中调用：
 
 ```objective-c
-UIFont *font = [UIFont fontWithName:@"SentyChalk" size:24.0f];
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [FYFontManager setFontURLStringArray:@[@"https://github.com/s2mh/Fonty/raw/master/FontFiles/SizeKnownFont.ttf",
+                                           @"http://115.28.28.235:8088/SizeUnknownFont.ttf"]];
+    return YES;
+}
 ```
 
-用`字体书`打开字体文件，就能找到对应的`PostScript name`了。例如：
+###字体信息
 
-*Open the font file with Font Book to find the PostScript name, like this:*
-![](https://github.com/s2mh/Fonty/raw/master/Screenshot/FindPostScriptNameInFontBook.png)
+`FYFontManager`会为每个加入的URLString创建一个`FYFontModel`对象。可以从`FYFontManager`的另一个数组：
 
+```objective-c
+@property (nonatomic, strong, readonly, class) NSArray<FYFontModel *> *fontModelArray;
+```
+中获得这些对象。`FYFontModel`用于描述了字体当前的信息，包括字体的下载URL，下载进度，状态，类型和PostScript name等。
 
-## Notification
+###按序号获取字体
 
-字体下载，缓存和删除过程中，Fonty会在主线程中发出`FYFontStatusNotification`通知。你可以从该通知的`userInfo`字典里中获得一个`FYFontModel`的对象。`FYFontModel`描述了字体的信息，包括字体的下载URL，下载进度，状态和PostScriptName等。你可以通过接收这个通知，从而跟踪字体信息的变化。
+有了字体信息的数组，我们就能按序号获取字体。当然你得先[下载字体文件](#DownloadFontFile)。
 
-*Fonty will post notifications called “FYFontStatusNotification” on the main thread, while it is downloading, caching or deleting fonts. You can get a "FYFontModel" type object in the "userInfo" dictionary of the notifications. The "FYFontModel" class decribes the font infomation, including the download URL, download progress, status and PostScriptName. You can handle this notificaion to track changes of the font information.*
+```objective-c
++ (UIFont *)fontAtIndex:(NSUInteger)index size:(CGFloat)size;
+```
+注意：序号不要越界。
 
-## Demo
+###设置主字体
 
-![](https://github.com/s2mh/Fonty/raw/master/Screenshot/Fonty-Demo.gif)
+如果在字体数组中，有一种最常用的字体，那么你可以把它设为`主字体`，也就是把它对应的序号设为`主序号`。设置的方法是把序号赋值给`FYFontManager.mainFontIndex`：
+
+```objective-c
+@property (nonatomic, assign, class) NSUInteger mainFontIndex;
+```
+
+例如：
+
+```objective-c
+FYFontManager.mainFontIndex = 0; // 把字体数组的第一种字体设为主字体
+```
+###获取主字体
+
+获取主字体的方法很简单：
+
+```objective-c
++ (UIFont *)mainFontOfSize:(CGFloat)size;
+```
+
+##改变字体风格
+
+在我们原本的工程中，通常使用UIFont的类方法
+
+```objective-c
++ (UIFont *)systemFontOfSize:(CGFloat)fontSize
+```
+来获得`系统字体`。Fonty可以用`主字体`替换`系统字体`，从而改变整个应用字体的风格。方法也很简单：
+
+```objective-c
+FYFontManager.usingMainStyle = YES; // 恢复使用系统字体，则设为NO
+```
+
+##bold版本和italic版本
+
+为了突出重点，上述介绍的用法忽略了`系统字体`的另外两种类型`bold`和`italic`：
+
+```objective-c
++ (UIFont *)boldSystemFontOfSize:(CGFloat)fontSize;
++ (UIFont *)italicSystemFontOfSize:(CGFloat)fontSize;
+```
+Fonty在`FYFontManager`中提供了与上述用法相似的`bold版本`和`italic版本`的属性和方法：
+
+```objective-c
++ (void)setBoldFontURLStringArray:(NSArray<NSString *> *)boldFontURLStringArray;
++ (void)setItalicFontURLStringArray:(NSArray<NSString *> *)italicFontURLStringArray;
+
++ (UIFont *)boldFontAtIndex:(NSUInteger)index size:(CGFloat)size;
++ (UIFont *)italicFontAtIndex:(NSUInteger)index size:(CGFloat)size;
+
+@property (nonatomic, strong, readonly, class) NSArray<FYFontModel *> *boldFontModelArray;
+@property (nonatomic, strong, readonly, class) NSArray<FYFontModel *> *italicFontModelArray;
+
+@property (nonatomic, assign, class) NSUInteger mainBoldFontIndex;
+@property (nonatomic, assign, class) NSUInteger mainItalicFontIndex;
+
++ (UIFont *)mainBoldFontOfSize:(CGFloat)size;
++ (UIFont *)mainItalicFontOfSize:(CGFloat)size;
+```
+
+##字体信息变化的通知
+
+程序运行时，下载，缓存和删除会导致字体信息的变化，`FYFontManager`会在主线程中发出`FYFontStatusNotification`通知。通知的`userInfo`字典里中获得一个key值为`FYFontStatusNotificationKey `的`FYFontModel`对象：
+
+```objective-c
+[[NSNotificationCenter defaultCenter] postNotificationName:FYFontStatusNotification
+                                                    object:self
+                                                  userInfo:@{FYFontStatusNotificationKey:model}];
+```
+监听这个通知，可以实时跟踪字体信息的变化。

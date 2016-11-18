@@ -183,9 +183,9 @@
     FYFontModel *newModel = [notification.userInfo objectForKey:FYFontStatusNotificationKey];
     NSInteger targetSection = 0;
     switch (newModel.type) {
-        case FYFontTypeFont:        targetSection = 0; break;
-        case FYFontTypeBoldFont:    targetSection = 1; break;
-        case FYFontTypeItalicFont:  targetSection = 2; break;
+        case FYFontTypeFont:       targetSection = 0; break;
+        case FYFontTypeBoldFont:   targetSection = 1; break;
+        case FYFontTypeItalicFont: targetSection = 2; break;
     }
     NSArray<FYFontModel *> *targetFontArray = self.fontArrayContainer[targetSection];
     NSInteger targetRow = [targetFontArray indexOfObject:newModel];
