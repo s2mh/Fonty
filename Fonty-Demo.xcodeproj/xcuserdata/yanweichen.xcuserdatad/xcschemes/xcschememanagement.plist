@@ -9,9 +9,19 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
+		<key>Fonty-DemoTests.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>6A6F37841DE3001700E0B360</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>6A73D6AB1D86BB2600D38630</key>
 		<dict>
 			<key>primary</key>

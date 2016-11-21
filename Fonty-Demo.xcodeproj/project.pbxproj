@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6A6F37881DE3001700E0B360 /* Fonty_DemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A6F37871DE3001700E0B360 /* Fonty_DemoTests.m */; };
 		6A73D6B11D86BB2600D38630 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A73D6B01D86BB2600D38630 /* main.m */; };
 		6A73D6B41D86BB2600D38630 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A73D6B31D86BB2600D38630 /* AppDelegate.m */; };
 		6A73D6B71D86BB2600D38630 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A73D6B61D86BB2600D38630 /* ViewController.m */; };
@@ -25,7 +26,20 @@
 		6ACFFD351DCC730500693BBF /* FYFontModelCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 6ACFFD341DCC730500693BBF /* FYFontModelCenter.m */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		6A6F378A1DE3001700E0B360 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6A73D6A41D86BB2600D38630 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6A73D6AB1D86BB2600D38630;
+			remoteInfo = "Fonty-Demo";
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		6A6F37851DE3001700E0B360 /* Fonty-DemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Fonty-DemoTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6A6F37871DE3001700E0B360 /* Fonty_DemoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Fonty_DemoTests.m; sourceTree = "<group>"; };
+		6A6F37891DE3001700E0B360 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6A73D6AC1D86BB2600D38630 /* Fonty-Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Fonty-Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A73D6B01D86BB2600D38630 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		6A73D6B21D86BB2600D38630 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -59,6 +73,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		6A6F37821DE3001700E0B360 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6A73D6A91D86BB2600D38630 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -69,11 +90,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6A6F37861DE3001700E0B360 /* Fonty-DemoTests */ = {
+			isa = PBXGroup;
+			children = (
+				6A6F37871DE3001700E0B360 /* Fonty_DemoTests.m */,
+				6A6F37891DE3001700E0B360 /* Info.plist */,
+			);
+			path = "Fonty-DemoTests";
+			sourceTree = "<group>";
+		};
 		6A73D6A31D86BB2600D38630 = {
 			isa = PBXGroup;
 			children = (
 				6A73D6AE1D86BB2600D38630 /* Fonty-Demo */,
 				6A73D6DA1D86C05000D38630 /* Fonty */,
+				6A6F37861DE3001700E0B360 /* Fonty-DemoTests */,
 				6A73D6AD1D86BB2600D38630 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -82,6 +113,7 @@
 			isa = PBXGroup;
 			children = (
 				6A73D6AC1D86BB2600D38630 /* Fonty-Demo.app */,
+				6A6F37851DE3001700E0B360 /* Fonty-DemoTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -140,6 +172,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		6A6F37841DE3001700E0B360 /* Fonty-DemoTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6A6F378E1DE3001700E0B360 /* Build configuration list for PBXNativeTarget "Fonty-DemoTests" */;
+			buildPhases = (
+				6A6F37811DE3001700E0B360 /* Sources */,
+				6A6F37821DE3001700E0B360 /* Frameworks */,
+				6A6F37831DE3001700E0B360 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6A6F378B1DE3001700E0B360 /* PBXTargetDependency */,
+			);
+			name = "Fonty-DemoTests";
+			productName = "Fonty-DemoTests";
+			productReference = 6A6F37851DE3001700E0B360 /* Fonty-DemoTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		6A73D6AB1D86BB2600D38630 /* Fonty-Demo */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6A73D6C31D86BB2600D38630 /* Build configuration list for PBXNativeTarget "Fonty-Demo" */;
@@ -166,6 +216,12 @@
 				LastUpgradeCheck = 0810;
 				ORGANIZATIONNAME = s2mh;
 				TargetAttributes = {
+					6A6F37841DE3001700E0B360 = {
+						CreatedOnToolsVersion = 8.1;
+						DevelopmentTeam = RR6E6G8SN5;
+						ProvisioningStyle = Automatic;
+						TestTargetID = 6A73D6AB1D86BB2600D38630;
+					};
 					6A73D6AB1D86BB2600D38630 = {
 						CreatedOnToolsVersion = 7.3.1;
 						DevelopmentTeam = RR6E6G8SN5;
@@ -187,11 +243,19 @@
 			projectRoot = "";
 			targets = (
 				6A73D6AB1D86BB2600D38630 /* Fonty-Demo */,
+				6A6F37841DE3001700E0B360 /* Fonty-DemoTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		6A6F37831DE3001700E0B360 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6A73D6AA1D86BB2600D38630 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -205,6 +269,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		6A6F37811DE3001700E0B360 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6A6F37881DE3001700E0B360 /* Fonty_DemoTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6A73D6A81D86BB2600D38630 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -227,6 +299,14 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		6A6F378B1DE3001700E0B360 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6A73D6AB1D86BB2600D38630 /* Fonty-Demo */;
+			targetProxy = 6A6F378A1DE3001700E0B360 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
 		6A73D6B81D86BB2600D38630 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
@@ -247,6 +327,38 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		6A6F378C1DE3001700E0B360 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				DEVELOPMENT_TEAM = RR6E6G8SN5;
+				INFOPLIST_FILE = "Fonty-DemoTests/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "s2mh.Fonty-DemoTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Fonty-Demo.app/Fonty-Demo";
+			};
+			name = Debug;
+		};
+		6A6F378D1DE3001700E0B360 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				DEVELOPMENT_TEAM = RR6E6G8SN5;
+				INFOPLIST_FILE = "Fonty-DemoTests/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "s2mh.Fonty-DemoTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Fonty-Demo.app/Fonty-Demo";
+			};
+			name = Release;
+		};
 		6A73D6C11D86BB2600D38630 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -368,6 +480,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		6A6F378E1DE3001700E0B360 /* Build configuration list for PBXNativeTarget "Fonty-DemoTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6A6F378C1DE3001700E0B360 /* Debug */,
+				6A6F378D1DE3001700E0B360 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		6A73D6A71D86BB2600D38630 /* Build configuration list for PBXProject "Fonty-Demo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
