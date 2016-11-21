@@ -1,6 +1,5 @@
 language: objective-c
-osx_image: xcode8.0
-script: 
-  - xctool -project Fonty-Demo.xcodeproj build test -sdk iphonesimulator GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES GCC_GENERATE_TEST_COVERAGE_FILES=YES
+script:
+  - xcodebuild test -project Fonty-Demo.xcodeproj -scheme 'Fonty-DemoTests' -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' -configuration Debug | xcpretty -c
 after_success:
   - bash <(curl -s https://codecov.io/bash)
