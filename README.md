@@ -1,35 +1,39 @@
-#这是什么
+#Fonty是什么
 
 这是一个处理iOS的自定义字体的开发框架。目前只有OC版本。
 
-#有什么功能
+#Fonty有什么功能
 
 该框架可以使应用在运行时动态地管理自定义字体，也可以用自定义字体替换系统内置的字体。
 
-#为什么做这个
+#为什么要有Fonty
 
 iOS系统内置有248种字体，但是其中简体汉字只有6种：
 ![](https://github.com/s2mh/UIFontTesting/raw/master/Screenshot/PingFang%20SC.png)
-这六种字体都属于PingFang SC，它们除了粗细之外没有差别。这导致原生iOS应用中的简体汉字样式比较单调。韩语字体和日语字体也是如此。
-可以参考我的[测试demo](https://github.com/s2mh/UIFontTesting)。
+这六种字体都属于PingFang SC，它们除了粗细之外没有差别。这导致原生iOS应用中的简体汉字样式比较单调。韩语字体和日语字体也是如此。可以参考我的[测试demo](https://github.com/s2mh/UIFontTesting)。
 
-#这是如何实现的
+创建Fonty的目的为了丰富iOS的字体。
+
+#Fonty是如何实现的
 
 该框架的主要实现方案如下：
 
-  - 将字体文件下载并保存到应用的沙盒中。
+  - 将字体文件下载并保存到应用的bundle中。
   - 使用CoreText框架，注册字体文件并获取字体的PostScript name。
   - 使用UIFont的+fontWithName:size:方法获得字体。
 
 
-#如何使用它
+#如何使用Fonty
 
-使用Fonty有两个原则，分别是*先下载后使用*和*一个URL对应一种字体*。
+使用Fonty有两个原则：
+
+  - 先下载后使用。
+  - 一个URLString对应一种字体。
 
 ##准备
 
-你要有你想使用的字体文件（ttf或otf格式的）。你可以在网上找，也可以自己制作并传到自己的网站或者服务器上。
-总之，你需要至少一个能用的字体文件的URL字符串。例如：
+你要有你想使用的字体文件（ttf或otf格式的）。你可以在网上找，也可以自己制作并传到自己的网站（比如GitHub）或者服务器上。
+总之，你需要至少一个能用的字体文件地址。例如：
 
 ```objective-c
 NSString *URLString = @"https://github.com/s2mh/Fonty/raw/master/FontFiles/SizeKnownFont.ttf";
@@ -48,41 +52,34 @@ end
 ```
 没有使用CocoaPods的工程，可以直接将框架下的文件直接复制到工程目录下。
 
-##获取字体
+##管理字体
 
 Fonty是按照`门面模式`设计的，它的门面是`FYFontManager`。也就是说，框架的使用者主要使用的是`FYFontManager`。
 
-###管理字体文件
+###处理字体文件
 
-<a name="DownloadFontFile"></a>FYFontManager包含了开始，暂停和取消下载字体文件，以及删除已下载的字体文件的方法：
+<a name="DownloadFontFile"></a>`FYFontManager`包含了开始，暂停和取消下载字体文件，以及删除已下载的字体文件的方法：
 
 ```objective-c
-+ (void)downloadFontWithURL:(NSURL *)URL;
 + (void)downloadFontWithURLString:(NSString *)URLString;
 
-+ (void)cancelDownloadingFontWithURL:(NSURL *)URL;
 + (void)cancelDownloadingFontWithURLString:(NSString *)URLString;
 
-+ (void)pauseDownloadingWithURL:(NSURL *)URL;
 + (void)pauseDownloadingWithURLString:(NSString *)URLString;
 
-+ (void)deleteFontWithURL:(NSURL *)URL;
 + (void)deleteFontWithURLString:(NSString *)URLString;
 ```
-注意在Fonty中`URLString == URL.absoluteString`。
 
 ###获得字体
 
 `FYFontManager`提供了获得字体的方法：
 
 ```objective-c
-+ (UIFont *)fontWithURL:(NSURL *)URL size:(CGFloat)size;
 + (UIFont *)fontWithURLString:(NSString *)URLString size:(CGFloat)size;
 ```
 为了方便起见，Fonty给UIFont添加了一个`FY_Fonty`类别。只需要加入头文件*UIFont+FY_Fonty.h*，即可使用其中的方法：
 
 ```objective-c
-+ (UIFont *)fy_fontWithURL:(NSURL *)URL size:(CGFloat)size;
 + (UIFont *)fy_fontWithURLString:(NSString *)URLString size:(CGFloat)size;
 ```
 
@@ -91,7 +88,7 @@ Fonty是按照`门面模式`设计的，它的门面是`FYFontManager`。也就�
 ```objective-c
 #import "UIFont+FY_Fonty.h"
 
-label.font = [UIFont fy_fontWithURL:downloadURL size:16.0f];
+label.font = [UIFont fy_fontWithURLString:downloadURLString size:16.0f];
 ```
 
 ##管理多种字体
@@ -123,7 +120,7 @@ Fonty可以同时管理多种字体。
 ```objective-c
 @property (nonatomic, strong, readonly, class) NSArray<FYFontModel *> *fontModelArray;
 ```
-中获得这些对象。`FYFontModel`用于描述了字体当前的信息，包括字体的下载URL，下载进度，状态，类型和PostScript name等。
+中获得这些对象。`FYFontModel`用于描述了字体当前的信息，包括字体的下载URL，下载进度，状态，类型和PostScript name等。[FYFontModel.h](https://github.com/s2mh/Fonty/blob/master/Fonty/FYFontModel.h)
 
 ###按序号获取字体
 
