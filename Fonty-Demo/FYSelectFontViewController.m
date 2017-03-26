@@ -257,8 +257,9 @@
 }
 
 - (void)assembleCell:(FYSelectFontTableViewCell *)cell withModel:(FYFontModel *)model {
-    cell.textLabel.text = model.description;
-    cell.textLabel.font = [UIFont fy_fontWithURL:model.downloadURL size:16.0f];
+    UIFont *font = [UIFont fy_fontWithURL:model.downloadURL size:16.0f];
+    cell.textLabel.text = (model.downloadProgress == 1.0f) ? font.fontDescriptor.postscriptName : model.description;
+    cell.textLabel.font = font;
     cell.detailTextLabel.text = nil;
     
     cell.downloadProgress = model.downloadProgress;

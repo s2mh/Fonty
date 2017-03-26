@@ -8,11 +8,16 @@
 
 #import <Foundation/Foundation.h>
 
+extern NSString * const FYFontRegisterErrorPostScriptName;
+
 @interface FYFontRegister : NSObject
 
 + (instancetype)sharedRegister;
 
+// Return the PostScript name of the font if the registration was successful,
+// otherwhise FYFontRegisterErrorPostScriptName.
 - (NSString *)registerFontWithPath:(NSString *)path;
+
 - (void)unregisterFontWithPath:(NSString *)path;
 
 @end

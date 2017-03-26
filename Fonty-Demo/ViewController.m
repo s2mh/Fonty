@@ -44,7 +44,6 @@ static const CGFloat FontSize = 17.0f;
                                                                       @"UIFontBoldSystemFontOfSize:",
                                                                       @"UIFontItalicSystemFontOfSize:"]];
     
-    
     self.sectionHeaderTitleArray = @[@"UIFont Selectors",
                                      @"UIFont (FY_Fonty) Selectors",
                                      @"FYFontManager Selectors"];
@@ -72,9 +71,9 @@ static const CGFloat FontSize = 17.0f;
     SEL selector = NSSelectorFromString(selectorString);
     id reciever = nil;
     if (selectStringArray == self.FYFontManagerSelectorStringArray) {
-        reciever = (id)[FYFontManager class];
+        reciever = [FYFontManager class];
     } else {
-        reciever = (id)[UIFont class];
+        reciever = [UIFont class];
     }
     UIFont *font = ((UIFont *(*)(id, SEL, CGFloat)) objc_msgSend)(reciever, selector, FontSize);
     

@@ -11,7 +11,7 @@
 #import "FYFontDownloader.h"
 #import "FYConst.h"
 
-static NSString * const FTFontCacheDirectoryName = @"FTFont";
+static NSString * const FYFontCacheDirectoryName = @"FYFont";
 
 @interface FYFontCache ()
 
@@ -120,7 +120,7 @@ static NSString * const FTFontCacheDirectoryName = @"FTFont";
 - (NSString *)diskCacheDirectoryPath {
     if (!_diskCacheDirectoryPath) {
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-        _diskCacheDirectoryPath = [[paths objectAtIndex:0] stringByAppendingPathComponent:FTFontCacheDirectoryName];
+        _diskCacheDirectoryPath = [[paths objectAtIndex:0] stringByAppendingPathComponent:FYFontCacheDirectoryName];
         [self.fileManager createDirectoryAtPath:_diskCacheDirectoryPath
                     withIntermediateDirectories:YES
                                      attributes:nil
