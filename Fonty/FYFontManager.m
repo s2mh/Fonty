@@ -15,7 +15,7 @@
 #import "FYFontDownloader.h"
 #import "FYFontModelCenter.h"
 
-static NSString *const FYFontSharedManager = @"FYFontSharedManager";
+static NSString *const FYFontSharedManagerName = @"FYFontSharedManagerName";
 
 @interface FYFontManager () <NSCoding>
 
@@ -25,6 +25,9 @@ static NSString *const FYFontSharedManager = @"FYFontSharedManager";
 @property (nonatomic, strong) NSMutableDictionary<NSURL *, NSString *> *sharedPostScriptNames; // key = URL, object = postScriptName
 
 @property (nonatomic, assign) BOOL sharedUsingMainStyle;
+
+
+@property (strong) FYFontModel *mainFontModel;
 
 @end
 
@@ -42,7 +45,7 @@ static NSString *const FYFontSharedManager = @"FYFontSharedManager";
     static FYFontManager *manager;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        manager = (FYFontManager *)[[FYFontCache sharedFontCache] objectFromCacheWithFileName:FYFontSharedManager];
+        manager = (FYFontManager *)[[FYFontCache sharedFontCache] objectFromCacheWithFileName:FYFontSharedManagerName];
         if (!manager) {
             manager = [self new];
         }
@@ -52,53 +55,23 @@ static NSString *const FYFontSharedManager = @"FYFontSharedManager";
 
 + (void)setup {
     FYFontCache *fontCache = [FYFontCache sharedFontCache];
-    fontCache.didCacheFileBlock = ^(NSString *downloadURLString) {
-        FYFontModel *model = [FYFontModelCenter fontModelWithURLString:downloadURLString];
-        if (model) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                model.status = FYFontModelDownloadStatusDownloaded;
-                [FYFontManager postNotificationWithModel:model];
-            });
-        }
+    fontCache.didCacheFileBlock = ^(FYFontFile *file) {
+        [[FYFontRegister sharedRegister] registerFontInFile:file];
     };
-    fontCache.didCleanFileBlock = ^(NSString *downloadURLString) {
-        FYFontModel *model = [FYFontModelCenter fontModelWithURLString:downloadURLString];
-        if (model) {
+    fontCache.didCleanFileBlock = ^(FYFontFile *file) {
+        if (file) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                NSUInteger index = [FYFontModelCenter indexOfModel:model];
-                switch (model.type) {
-                    case FYFontTypeFont:
-                        if (index == FYFontManager.mainFontIndex) {
-                            FYFontManager.mainFontIndex = 0;
-                        }
-                        break;
-                    case FYFontTypeBoldFont:
-                        if (index == FYFontManager.mainBoldFontIndex) {
-                            FYFontManager.mainBoldFontIndex = 0;
-                        }
-                        break;
-                    case FYFontTypeItalicFont:
-                        if (index == FYFontManager.mainItalicFontIndex) {
-                            FYFontManager.mainItalicFontIndex = 0;
-                        }
-                        break;
-                }
-                [[[FYFontManager sharedManager] sharedPostScriptNames] removeObjectForKey:model.downloadURL];
-                model.downloadProgress = 0.0f;
-                model.fileDownloadedSize = 0;
-                model.status = FYFontModelDownloadStatusToBeDownloaded;
-                [FYFontManager postNotificationWithModel:model];
+                [file clear];
+                [FYFontManager postNotificationWithFile:file];
             });
         }
     };
     
     FYFontDownloader *fontDownloader = [FYFontDownloader sharedDownloader];
-    fontDownloader.trackDownloadBlock = ^(FYFontModel *currentModel) {
-        FYFontModel *model = [FYFontModelCenter fontModelWithURLString:currentModel.downloadURL.absoluteString];
-        if (model) {
-            if ((model.status == FYFontModelDownloadStatusDownloading) &&
-                (currentModel.status == FYFontModelDownloadStatusDownloading) &&
-                (model.fileSizeUnknown || (model.downloadProgress > currentModel.downloadProgress))) {
+    fontDownloader.timeoutInterval = 180.0;
+    fontDownloader.trackDownloadBlock = ^(FYFontFile *file) {
+        if (file) {
+            if ((file.status == FYFontFileDownloadStatusDownloading) && file.fileSizeUnknown) {
                 return;
             }
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -107,6 +80,16 @@ static NSString *const FYFontSharedManager = @"FYFontSharedManager";
             });
         }
     };    
+}
+
++ (void)setMainFontModel:(FYFontModel *)mainFontModel {
+    if ([[FYFontManager sharedManager] mainFontModel] != mainFontModel) {
+        [[FYFontManager sharedManager] setMainFontModel:mainFontModel];
+    }
+}
+
++ (FYFontModel *)mainFontModel {
+    return [[FYFontManager sharedManager] mainFontModel];
 }
 
 - (instancetype)init
@@ -144,14 +127,14 @@ static NSString *const FYFontSharedManager = @"FYFontSharedManager";
 
 #pragma mark - Private
 
-+ (void)postNotificationWithModel:(FYFontModel *)model {
++ (void)postNotificationWithFile:(FYFontFile *)file {
     [[NSNotificationCenter defaultCenter] postNotificationName:FYFontStatusNotification
                                                         object:self
-                                                      userInfo:@{FYFontStatusNotificationKey:model}];
+                                                      userInfo:@{FYFontStatusNotificationKey:file}];
 }
 
 - (void)cacheSelf {
-    [[FYFontCache sharedFontCache] cacheObject:self cacheFileName:FYFontSharedManager];
+    [[FYFontCache sharedFontCache] cacheObject:self fileName:FYFontSharedManager];
 }
 
 #pragma mark - Public

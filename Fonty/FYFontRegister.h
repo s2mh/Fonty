@@ -7,6 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "FYFontModel.h"
+#import "FYFontFile.h"
 
 extern NSString * const FYFontRegisterErrorPostScriptName;
 
@@ -16,8 +18,8 @@ extern NSString * const FYFontRegisterErrorPostScriptName;
 
 // Return the PostScript name of the font if the registration was successful,
 // otherwhise FYFontRegisterErrorPostScriptName.
-- (NSString *)registerFontWithPath:(NSString *)path;
-
+- (NSArray<FYFontModel *> *)registerFontWithPath:(NSString *)path;
+- (BOOL)registerFontInFile:(FYFontFile *)file;
 - (void)unregisterFontWithPath:(NSString *)path;
 
 @end

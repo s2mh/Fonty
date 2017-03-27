@@ -7,11 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "FYFontModel.h"
+#import "FYFontFile.h"
 
 @interface FYFontModelCenter : NSObject
 
-+ (void)setFontURLStringArray:(NSArray<NSString *> *)URLStringArray;
++ (void)setFontURLStringArray1:(NSArray<NSString *> *)URLStringArray;
 + (void)setBoldFontURLStringArray:(NSArray<NSString *> *)URLStringArray;
 + (void)setItalicFontURLStringArray:(NSArray<NSString *> *)URLStringArray;
 
@@ -21,5 +21,9 @@
 
 + (FYFontModel *)fontModelWithURLString:(NSString *)URLString;
 + (NSUInteger)indexOfModel:(FYFontModel *)model;
+
+
+@property (nonatomic, strong, class) NSArray<NSString *> *URLStrings;
+@property (nonatomic, strong, class, readonly) NSArray<FYFontFile *> *fontFiles;
 
 @end

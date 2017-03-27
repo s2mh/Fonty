@@ -7,16 +7,18 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "FYFontModel.h"
+
+@class FYFontFile;
 
 @interface FYFontDownloader : NSObject
 
 + (instancetype)sharedDownloader;
 
-- (void)downloadFontWithURL:(NSURL *)URL;
-- (void)cancelDownloadingFontWithURL:(NSURL *)URL;
-- (void)suspendDownloadWithURL:(NSURL *)URL;
+@property (nonatomic, copy) void(^trackDownloadBlock)(FYFontFile *file);
+@property (nonatomic, assign) NSTimeInterval timeoutInterval;
 
-@property (nonatomic, copy) void(^trackDownloadBlock)(FYFontModel *currentModel);
+- (void)downloadFontFile:(FYFontFile *)file;
+- (void)cancelDownloadingFile:(FYFontFile *)file;
+- (void)suspendDownloadFile:(FYFontFile *)file;
 
 @end

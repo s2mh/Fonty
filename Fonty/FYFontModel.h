@@ -8,14 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-
-typedef NS_ENUM(NSUInteger, FYFontModelDownloadStatus) {
-    FYFontModelDownloadStatusToBeDownloaded,
-    FYFontModelDownloadStatusDownloading,
-    FYFontModelDownloadStatusSuspending,
-    FYFontModelDownloadStatusDownloaded,
-    FYFontModelDownloadStatusDeleting
-};
+@class UIFont;
 
 typedef NS_ENUM(NSUInteger, FYFontType) {
     FYFontTypeFont = 0,
@@ -25,21 +18,8 @@ typedef NS_ENUM(NSUInteger, FYFontType) {
 
 @interface FYFontModel : NSObject
 
-@property (nonatomic, assign) FYFontModelDownloadStatus status;
 @property (nonatomic, assign) FYFontType type;
-
-// aka CSS name
+@property (nonatomic, strong) UIFont *font;
 @property (nonatomic, copy) NSString *postScriptName;
-
-@property (nonatomic, copy) NSURL *downloadURL;
-@property (nonatomic, copy) NSError *downloadError;
-
-@property (nonatomic, assign) int64_t fileSize;
-@property (nonatomic, assign) int64_t fileDownloadedSize;
-@property (nonatomic, assign) double downloadProgress;
-@property (nonatomic, assign) BOOL fileSizeUnknown;
-
-+ (instancetype)modelWithSessionDownloadTask:(NSURLSessionDownloadTask *)task;
-- (void)setWithModel:(FYFontModel *)newModel;
 
 @end

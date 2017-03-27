@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		527192151E89331300A05154 /* FYFontFileCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 527192141E89331300A05154 /* FYFontFileCenter.m */; };
+		52F9EA201E88B78500D7EE30 /* FYFontFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 52F9EA1F1E88B78500D7EE30 /* FYFontFile.m */; };
 		6A6F37881DE3001700E0B360 /* Fonty_DemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A6F37871DE3001700E0B360 /* Fonty_DemoTests.m */; };
 		6A73D6B11D86BB2600D38630 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A73D6B01D86BB2600D38630 /* main.m */; };
 		6A73D6B41D86BB2600D38630 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6A73D6B31D86BB2600D38630 /* AppDelegate.m */; };
@@ -37,6 +39,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		527192131E89331300A05154 /* FYFontFileCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FYFontFileCenter.h; sourceTree = "<group>"; };
+		527192141E89331300A05154 /* FYFontFileCenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FYFontFileCenter.m; sourceTree = "<group>"; };
+		52F9EA1E1E88B78500D7EE30 /* FYFontFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FYFontFile.h; sourceTree = "<group>"; };
+		52F9EA1F1E88B78500D7EE30 /* FYFontFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FYFontFile.m; sourceTree = "<group>"; };
 		6A6F37851DE3001700E0B360 /* Fonty-DemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Fonty-DemoTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A6F37871DE3001700E0B360 /* Fonty_DemoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Fonty_DemoTests.m; sourceTree = "<group>"; };
 		6A6F37891DE3001700E0B360 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -165,6 +171,10 @@
 				6A73D6E71D86C05000D38630 /* UIFont+FY_Fonty.m */,
 				6ACFFD331DCC730500693BBF /* FYFontModelCenter.h */,
 				6ACFFD341DCC730500693BBF /* FYFontModelCenter.m */,
+				527192131E89331300A05154 /* FYFontFileCenter.h */,
+				527192141E89331300A05154 /* FYFontFileCenter.m */,
+				52F9EA1E1E88B78500D7EE30 /* FYFontFile.h */,
+				52F9EA1F1E88B78500D7EE30 /* FYFontFile.m */,
 			);
 			path = Fonty;
 			sourceTree = "<group>";
@@ -288,8 +298,10 @@
 				6A73D6E81D86C05000D38630 /* FYFontCache.m in Sources */,
 				6A73D6EA1D86C05000D38630 /* FYFontManager.m in Sources */,
 				6A73D6F31D86C09500D38630 /* FYSelectFontTableViewCell.m in Sources */,
+				52F9EA201E88B78500D7EE30 /* FYFontFile.m in Sources */,
 				6A73D6E91D86C05000D38630 /* FYFontDownloader.m in Sources */,
 				6A73D6B11D86BB2600D38630 /* main.m in Sources */,
+				527192151E89331300A05154 /* FYFontFileCenter.m in Sources */,
 				6A73D6EC1D86C05000D38630 /* FYFontRegister.m in Sources */,
 				6A73D6ED1D86C05000D38630 /* UIFont+FY_Fonty.m in Sources */,
 				6A8DD3411D880335005C6E8E /* FYConst.m in Sources */,
@@ -487,6 +499,7 @@
 				6A6F378D1DE3001700E0B360 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		6A73D6A71D86BB2600D38630 /* Build configuration list for PBXProject "Fonty-Demo" */ = {
 			isa = XCConfigurationList;

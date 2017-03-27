@@ -30,4 +30,12 @@
     return [FYFontManager fontWithURLString:URLString size:size];
 }
 
++ (UIFont *)fy_fontWithSize:(CGFloat)size {
+    
+}
+
++ (UIFont *)fy_fontOfModel:(FYFontModel *)model withSize:(CGFloat)size {
+    
+}
+
 @end

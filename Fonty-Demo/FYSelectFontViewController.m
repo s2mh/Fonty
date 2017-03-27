@@ -57,10 +57,6 @@
                                              selector:@selector(noticeDownload:)
                                                  name:FYFontStatusNotification
                                                object:nil];
-    
-    self.maxArrayCount = MAX(FYFontManager.fontModelArray.count,
-                             MAX(FYFontManager.boldFontModelArray.count,
-                                 FYFontManager.italicFontModelArray.count));
 }
 
 - (void)viewWillDisappear:(BOOL)animated {

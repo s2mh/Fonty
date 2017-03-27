@@ -135,6 +135,8 @@
 
 #pragma mark - Accessor
 
-
++ (NSArray<NSString *> *)URLStrings {
+    
+}
 
 @end
