@@ -11,7 +11,4 @@
 
 @interface FYFontFileCenter : NSObject
 
-@property (class, copy) NSArray<NSString *> *URLStrings;
-@property (class, copy, readonly) NSArray<FYFontFile *> *fontFiles;
-
 @end

@@ -9,7 +9,7 @@
 #import "ViewController.h"
 #import <objc/message.h>
 #import "FYSelectFontViewController.h"
-#import "FYFontManager.h"
+#import "UIFont+FY_Fonty.h"
 
 static const CGFloat FontSize = 17.0f;
 
@@ -68,17 +68,17 @@ static const CGFloat FontSize = 17.0f;
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     NSArray<NSString *> *selectStringArray = self.arrayContainer[indexPath.section];
     NSString *selectorString = selectStringArray[indexPath.row];
-    SEL selector = NSSelectorFromString(selectorString);
-    id reciever = nil;
-    if (selectStringArray == self.FYFontManagerSelectorStringArray) {
-        reciever = [FYFontManager class];
-    } else {
-        reciever = [UIFont class];
-    }
-    UIFont *font = ((UIFont *(*)(id, SEL, CGFloat)) objc_msgSend)(reciever, selector, FontSize);
+//    SEL selector = NSSelectorFromString(selectorString);
+//    id reciever = nil;
+//    if (selectStringArray == self.FYFontManagerSelectorStringArray) {
+//        reciever = [FYFontManager class];
+//    } else {
+//        reciever = [UIFont class];
+//    }
+//    UIFont *font = ((UIFont *(*)(id, SEL, CGFloat)) objc_msgSend)(reciever, selector, FontSize);
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"UITableViewCell" forIndexPath:indexPath];
-    cell.textLabel.font = font;
+    cell.textLabel.font = [UIFont fy_fontWithSize:FontSize];
     cell.textLabel.text = [NSString stringWithFormat:@"%@ 是这样的", selectorString];
     return cell;
 }

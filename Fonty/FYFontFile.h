@@ -14,24 +14,25 @@ typedef NS_ENUM(NSUInteger, FYFontFileDownloadStatus) {
     FYFontFileDownloadStatusDownloading,
     FYFontFileDownloadStatusSuspending,
     FYFontFileDownloadStatusDownloaded,
-    FYFontFileDownloadStatusDeleting
 };
 
 @interface FYFontFile : NSObject <NSCopying>
 
-@property (nonatomic, assign) FYFontFileDownloadStatus status;
+@property (nonatomic, copy) NSURL *downloadURL;
+@property (nonatomic, copy) NSURL *localURL;
 
-@property (nonatomic, copy) NSURL *fileDownloadURL;
-@property (nonatomic, copy) NSURL *fileLocalURL;
+@property (nonatomic, assign) BOOL cached;
+@property (nonatomic, assign) BOOL registered;
 
-@property (nonatomic, assign) int64_t fileSize;
-@property (nonatomic, assign) int64_t fileDownloadedSize;
-@property (nonatomic, assign) double downloadProgress;
-@property (nonatomic, assign) BOOL fileSizeUnknown;
+@property (nonatomic, assign, readonly) FYFontFileDownloadStatus downloadStatus;
+@property (nonatomic, assign, readonly) int64_t fileSize;
+@property (nonatomic, assign, readonly) int64_t fileDownloadedSize;
+@property (nonatomic, assign, readonly) double downloadProgress;
+@property (nonatomic, assign, readonly) BOOL fileSizeUnknown;
+@property (nonatomic, copy, readonly) NSError *downloadError;
 
-@property (nonatomic, copy) NSError *downloadError;
 @property (nonatomic, copy) NSArray<FYFontModel *> *fontModels;
-@property (nonatomic, weak) NSURLSessionDownloadTask *downloadTask;
+@property (atomic, strong) NSURLSessionDownloadTask *downloadTask;
 
 - (instancetype)initWithURLString:(NSString *)URLString;
 - (void)clear;

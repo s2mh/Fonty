@@ -60,33 +60,45 @@ static NSString * const FYFontCacheDirectoryName = @"FYFont";
     }
 }
 
-- (void)cacheFile:(FYFontFile *)file {
-    NSString *filePath = [self filePathForDownloadURLString:file.fileDownloadURL.absoluteString];
+- (BOOL)cacheFile:(FYFontFile *)file {
+    NSString *filePath = [self filePathForDownloadURLString:file.downloadURL.absoluteString];
     if ([self.fileManager fileExistsAtPath:filePath]) {
         [self.fileManager removeItemAtPath:filePath error:NULL];
     }
     NSURL *docsDirURL = [NSURL fileURLWithPath:filePath];
     NSError *error = nil;
-    [self.fileManager moveItemAtURL:file.fileLocalURL
+    [self.fileManager moveItemAtURL:file.localURL
                               toURL:docsDirURL
                               error:&error];
     if (!error) {
-        file.fileLocalURL = docsDirURL;
+        file.localURL = docsDirURL;
+        file.cached = YES;
+        
+        if (self.didCacheFileBlock) {
+            self.didCacheFileBlock(file);
+        };
+        return YES;
+    } else {
+        return NO;
     }
-    
-    if (self.didCacheFileBlock) {
-        self.didCacheFileBlock(file);
-    };
 }
 
-- (void)cleanCachedFile:(FYFontFile *)file {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSString *filePath = [self filePathForDownloadURLString:file.fileDownloadURL.absoluteString];
-        [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
+- (BOOL)cleanCachedFile:(FYFontFile *)file {
+    NSString *filePath = [self filePathForDownloadURLString:file.downloadURL.absoluteString];
+    NSError *error = nil;
+    [[NSFileManager defaultManager] removeItemAtPath:filePath error:&error];
+    if (!error) {
+        file.localURL = nil;
+        file.cached = NO;
+        
         if (self.didCleanFileBlock) {
             self.didCleanFileBlock(file);
         };
-    });
+        
+        return YES;
+    } else {
+        return NO;
+    }
 }
 
 #pragma mark - Private

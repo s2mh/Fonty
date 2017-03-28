@@ -16,10 +16,7 @@ extern NSString * const FYFontRegisterErrorPostScriptName;
 
 + (instancetype)sharedRegister;
 
-// Return the PostScript name of the font if the registration was successful,
-// otherwhise FYFontRegisterErrorPostScriptName.
-- (NSArray<FYFontModel *> *)registerFontWithPath:(NSString *)path;
-- (BOOL)registerFontInFile:(FYFontFile *)file;
-- (void)unregisterFontWithPath:(NSString *)path;
+- (void)registerFontInFile:(FYFontFile *)file completeHandler:(void(^)(BOOL success))handler;
+- (void)unregisterFontInFile:(FYFontFile *)file completeHandler:(void(^)(BOOL success))handler;
 
 @end

@@ -11,19 +11,19 @@
 
 @interface FYFontModelCenter : NSObject
 
-+ (void)setFontURLStringArray1:(NSArray<NSString *> *)URLStringArray;
-+ (void)setBoldFontURLStringArray:(NSArray<NSString *> *)URLStringArray;
-+ (void)setItalicFontURLStringArray:(NSArray<NSString *> *)URLStringArray;
-
-+ (NSMutableArray<FYFontModel *> *)fontModelArray;
-+ (NSMutableArray<FYFontModel *> *)boldFontModelArray;
-+ (NSMutableArray<FYFontModel *> *)italicFontModelArray;
-
-+ (FYFontModel *)fontModelWithURLString:(NSString *)URLString;
-+ (NSUInteger)indexOfModel:(FYFontModel *)model;
-
-
-@property (nonatomic, strong, class) NSArray<NSString *> *URLStrings;
-@property (nonatomic, strong, class, readonly) NSArray<FYFontFile *> *fontFiles;
+//+ (void)setFontURLStringArray1:(NSArray<NSString *> *)URLStringArray;
+//+ (void)setBoldFontURLStringArray:(NSArray<NSString *> *)URLStringArray;
+//+ (void)setItalicFontURLStringArray:(NSArray<NSString *> *)URLStringArray;
+//
+//+ (NSMutableArray<FYFontModel *> *)fontModelArray;
+//+ (NSMutableArray<FYFontModel *> *)boldFontModelArray;
+//+ (NSMutableArray<FYFontModel *> *)italicFontModelArray;
+//
+//+ (FYFontModel *)fontModelWithURLString:(NSString *)URLString;
+//+ (NSUInteger)indexOfModel:(FYFontModel *)model;
+//
+//
+//@property (nonatomic, strong, class) NSArray<NSString *> *URLStrings;
+//@property (nonatomic, strong, class, readonly) NSArray<FYFontFile *> *fontFiles;
 
 @end

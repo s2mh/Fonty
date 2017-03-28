@@ -19,12 +19,15 @@
 
 + (void)saveSettins;
 
-
 + (void)downloadFontFile:(FYFontFile *)file;
 + (void)cancelDownloadingFontFile:(FYFontFile *)file;
 + (void)pauseDownloadingFile:(FYFontFile *)file;
 + (void)deleteFontFile:(FYFontFile *)file;
 
 @property (class, weak) FYFontModel *mainFontModel;
+
+@property (class, copy) NSArray<NSString *> *fileURLStrings;
+@property (class, copy, readonly) NSArray<FYFontFile *> *fontFiles;
+
 
 @end

@@ -33,7 +33,7 @@
 - (void)downloadFontFile:(FYFontFile *)file {
     NSURLSessionDownloadTask *downloadTask = file.downloadTask;
     if (!downloadTask) {
-        downloadTask = [self.session downloadTaskWithURL:file.fileDownloadURL];
+        downloadTask = [self.session downloadTaskWithURL:file.downloadURL];
         [downloadTask addObserver:self forKeyPath:@"state" options:NSKeyValueObservingOptionNew context:NULL];
         file.downloadTask = downloadTask;
         [self.fileDictionary setObject:file
@@ -71,6 +71,9 @@
 
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask
                               didFinishDownloadingToURL:(NSURL *)location {
+    FYFontFile *file = [self.fileDictionary objectForKey:downloadTask];
+    file.localURL = location;
+    [[FYFontCache sharedFontCache] cacheFile:file]; // should cache immediately
     [self trackDownloadTask:downloadTask];
 }
 
@@ -84,6 +87,7 @@
 #pragma mark - Private
 
 - (void)trackDownloadTask:(NSURLSessionDownloadTask *)task {
+    
     if (self.trackDownloadBlock) {
         FYFontFile *file = [self.fileDictionary objectForKey:task];
         self.trackDownloadBlock(file);
@@ -94,8 +98,8 @@
 }
 
 - (void)freeTask:(NSURLSessionDownloadTask *)task {
-    [self.fileDictionary removeObjectForKey:task];
     [task removeObserver:self forKeyPath:@"state"];
+    [self.fileDictionary removeObjectForKey:task];
 }
 
 #pragma mark - accessor

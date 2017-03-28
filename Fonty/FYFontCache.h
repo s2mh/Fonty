@@ -18,8 +18,8 @@
 - (BOOL)cacheObject:(id)object fileName:(NSString *)fileName;
 - (instancetype)objectFromCacheWithFileName:(NSString *)fileName;
 
-- (void)cacheFile:(FYFontFile *)file;
-- (void)cleanCachedFile:(FYFontFile *)file;
+- (BOOL)cacheFile:(FYFontFile *)file;
+- (BOOL)cleanCachedFile:(FYFontFile *)file;
 
 
 @property (nonatomic, copy) void(^didCleanFileBlock)(FYFontFile *file);

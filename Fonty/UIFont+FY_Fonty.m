@@ -10,32 +10,32 @@
 
 @implementation UIFont (FY_Fonty)
 
-+ (UIFont *)fy_mainFontOfSize:(CGFloat)size {
-    return [FYFontManager mainFontOfSize:size];
-}
-
-+ (UIFont *)fy_mainBoldFontOfSize:(CGFloat)size {
-    return [FYFontManager mainBoldFontOfSize:size];
-}
-
-+ (UIFont *)fy_mainItalicFontOfSize:(CGFloat)size {
-    return [FYFontManager mainItalicFontOfSize:size];
-}
-
-+ (UIFont *)fy_fontWithURL:(NSURL *)URL size:(CGFloat)size {
-    return [FYFontManager fontWithURL:URL size:size];
-}
-
-+ (UIFont *)fy_fontWithURLString:(NSString *)URLString size:(CGFloat)size {
-    return [FYFontManager fontWithURLString:URLString size:size];
-}
+//+ (UIFont *)fy_mainFontOfSize:(CGFloat)size {
+//    return [FYFontManager mainFontOfSize:size];
+//}
+//
+//+ (UIFont *)fy_mainBoldFontOfSize:(CGFloat)size {
+//    return [FYFontManager mainBoldFontOfSize:size];
+//}
+//
+//+ (UIFont *)fy_mainItalicFontOfSize:(CGFloat)size {
+//    return [FYFontManager mainItalicFontOfSize:size];
+//}
+//
+//+ (UIFont *)fy_fontWithURL:(NSURL *)URL size:(CGFloat)size {
+//    return [FYFontManager fontWithURL:URL size:size];
+//}
+//
+//+ (UIFont *)fy_fontWithURLString:(NSString *)URLString size:(CGFloat)size {
+//    return [FYFontManager fontWithURLString:URLString size:size];
+//}
 
 + (UIFont *)fy_fontWithSize:(CGFloat)size {
-    
+    return [self fy_fontOfModel:[FYFontManager mainFontModel] withSize:size];
 }
 
 + (UIFont *)fy_fontOfModel:(FYFontModel *)model withSize:(CGFloat)size {
-    
+    return [model.font fontWithSize:size];
 }
 
 @end
