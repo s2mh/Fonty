@@ -1,4 +1,4 @@
-//
+		//
 //  FYFontRegister.m
 //  Fonty
 //
@@ -7,66 +7,70 @@
 //
 
 #import <CoreText/CoreText.h>
+#import <UIKit/UIKit.h>
 #import "FYFontRegister.h"
 
 NSString * const FYFontRegisterErrorPostScriptName = @"FYFontRegisterErrorPostScriptName";
 
 @implementation FYFontRegister
 
-+ (instancetype)sharedRegister {
-    static id instance;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        instance = [self new];
-    });
-    return instance;
++ (BOOL)registerFontInFile:(FYFontFile *)file {
+    CFStringRef fontPath = CFStringCreateWithCString(NULL, [file.localURLString UTF8String], kCFStringEncodingUTF8);
+    CFURLRef fontURL = CFURLCreateWithFileSystemPath(NULL, fontPath, kCFURLPOSIXPathStyle, 0);
+    CFErrorRef error = NULL;
+    CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeNone, &error);
+    
+    if (error) {
+        CFRelease(fontURL);
+        CFRelease(fontPath);
+        CFRelease(error);
+        return NO;
+    }
+    CFArrayRef fontArray = CTFontManagerCreateFontDescriptorsFromURL(fontURL);
+    NSMutableArray *fontModels = [NSMutableArray array];
+    if (fontArray) {
+        CGFloat size = 0.0;
+        for (CFIndex i = 0 ; i < CFArrayGetCount(fontArray); i++) {
+            CTFontDescriptorRef descriptor = CFArrayGetValueAtIndex(fontArray, i);
+            CTFontRef fontRef = CTFontCreateWithFontDescriptor(descriptor, size, NULL);
+            CFStringRef fontName = CTFontCopyName(fontRef, kCTFontPostScriptNameKey);
+            UIFont *font = CFBridgingRelease(CTFontCreateWithNameAndOptions(fontName, 0.0, NULL, kCTFontOptionsDefault));
+            if (font) {
+                FYFontModel *model = [[FYFontModel alloc] init];
+                model.postScriptName = CFBridgingRelease(fontName);
+                model.font = font;
+                model.fontFile = file;
+                [fontModels addObject:model];
+            }
+            CFRelease(fontRef);
+        }
+        file.fontModels = fontModels;
+        if (fontModels.count > 0) {
+            file.registered = YES;
+        }
+        CFRelease(fontArray);
+    }
+    CFRelease(fontURL);
+    CFRelease(fontPath);
+    return YES;
 }
 
-- (NSString *)registerFontWithPath:(NSString *)path {
-    NSString *postScriptName = nil;
-    NSURL *fontURL = [NSURL fileURLWithPath:path];
-    CGDataProviderRef fontDataProvider = CGDataProviderCreateWithURL((__bridge CFURLRef)fontURL);
-    CGFontRef fontRef = CGFontCreateWithDataProvider(fontDataProvider);
-    if (fontRef && CTFontManagerRegisterGraphicsFont(fontRef, NULL)) {
-        postScriptName = CFBridgingRelease(CGFontCopyPostScriptName(fontRef));
-        CGFontRelease(fontRef);
++ (BOOL)unregisterFontInFile:(FYFontFile *)file {
+    BOOL success = YES;
+    if (file.localURLString) {
+        CFStringRef fontPath = CFStringCreateWithCString(NULL, [file.localURLString UTF8String], kCFStringEncodingUTF8);
+        CFURLRef fontURL = CFURLCreateWithFileSystemPath(NULL, fontPath, kCFURLPOSIXPathStyle, 0);
+        if (fontURL) {
+            success = CTFontManagerUnregisterFontsForURL(fontURL, kCTFontManagerScopeNone, NULL);
+        }
+        CFRelease(fontURL);
+        CFRelease(fontPath);
+        if (success) {
+            file.registered = NO;
+        }
     }
-    CGDataProviderRelease(fontDataProvider);
-    
-    if (!postScriptName) {
-        postScriptName = FYFontRegisterErrorPostScriptName;
-    }
-    
-    return postScriptName;
+    return success;
 }
 
-- (NSArray *)customFontArrayWithPath:(NSString *)path size:(CGFloat)size
-{
-    CFStringRef fontPath = CFStringCreateWithCString(NULL, [path UTF8String], kCFStringEncodingUTF8);
-    CFURLRef fontUrl = CFURLCreateWithFileSystemPath(NULL, fontPath, kCFURLPOSIXPathStyle, 0);
-    CFArrayRef fontArray = CTFontManagerCreateFontDescriptorsFromURL(fontUrl);
-    CTFontManagerRegisterFontsForURL(fontUrl, kCTFontManagerScopeNone, NULL);
-    NSMutableArray *customFontArray = [NSMutableArray array];
-    for (CFIndex i = 0 ; i < CFArrayGetCount(fontArray); i++){
-        CTFontDescriptorRef descriptor = CFArrayGetValueAtIndex(fontArray, i);
-        CTFontRef fontRef = CTFontCreateWithFontDescriptor(descriptor, size, NULL);
-        NSString *fontName = CFBridgingRelease(CTFontCopyName(fontRef, kCTFontPostScriptNameKey));
-        [customFontArray addObject:fontName];
-    }
-    
-    
-    return customFontArray;
-}
-
-- (void)unregisterFontWithPath:(NSString *)path {
-    NSURL *fontURL = [NSURL fileURLWithPath:path];
-    CGDataProviderRef fontDataProvider = CGDataProviderCreateWithURL((__bridge CFURLRef)fontURL);
-    CGFontRef fontRef = CGFontCreateWithDataProvider(fontDataProvider);
-    if (fontRef) {
-        CTFontManagerUnregisterGraphicsFont(fontRef, NULL);
-        CGFontRelease(fontRef);
-    }
-    CGDataProviderRelease(fontDataProvider);
-}
 
 @end

@@ -9,11 +9,12 @@
 #import "FYFontDownloader.h"
 #import "FYFontCache.h"
 #import "FYConst.h"
+#import "FYFontFile.h"
 
 @interface FYFontDownloader () <NSURLSessionDownloadDelegate>
 
 @property (nonatomic, strong) NSURLSession *session;
-@property (nonatomic, strong) NSMutableDictionary<NSURL *, NSURLSessionDownloadTask *> *taskDictionary;
+@property (nonatomic, strong) NSMutableDictionary<NSURLSessionDownloadTask *, FYFontFile *> *fileDictionary;
 
 @end
 
@@ -28,27 +29,31 @@
     return instance;
 }
 
-- (void)downloadFontWithURL:(NSURL *)URL {
-    NSURLSessionDownloadTask *downloadTask = [self.taskDictionary objectForKey:URL];
+
+- (void)downloadFontFile:(FYFontFile *)file {
+    NSURLSessionDownloadTask *downloadTask = file.downloadTask;
     if (!downloadTask) {
-        downloadTask = [self.session downloadTaskWithURL:URL];
+        downloadTask = [self.session downloadTaskWithURL:[NSURL URLWithString:file.downloadURLString]];
         [downloadTask addObserver:self forKeyPath:@"state" options:NSKeyValueObservingOptionNew context:NULL];
-        [self.taskDictionary setObject:downloadTask forKey:URL];
+        file.downloadTask = downloadTask;
+        [self.fileDictionary setObject:file
+                                forKey:downloadTask];
     }
     if (downloadTask && (downloadTask.state == NSURLSessionTaskStateSuspended)) {
         [downloadTask resume];
     }
 }
 
-- (void)cancelDownloadingFontWithURL:(NSURL *)URL {
-    NSURLSessionDownloadTask *downloadTask = [self.taskDictionary objectForKey:URL];
+
+- (void)cancelDownloadingFile:(FYFontFile *)file {
+    NSURLSessionDownloadTask *downloadTask = file.downloadTask;
     if (downloadTask && (downloadTask.state == NSURLSessionTaskStateRunning || downloadTask.state == NSURLSessionTaskStateSuspended)) {
         [downloadTask cancelByProducingResumeData:^(NSData * _Nullable resumeData) {}];
     }
 }
 
-- (void)suspendDownloadWithURL:(NSURL *)URL {
-    NSURLSessionDownloadTask *downloadTask = [self.taskDictionary objectForKey:URL];
+- (void)suspendDownloadFile:(FYFontFile *)file {
+    NSURLSessionDownloadTask *downloadTask = file.downloadTask;
     if (downloadTask && (downloadTask.state == NSURLSessionTaskStateRunning)) {
         [downloadTask suspend];
     }
@@ -66,8 +71,10 @@
 
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask
                               didFinishDownloadingToURL:(NSURL *)location {
-    [[FYFontCache sharedFontCache] cacheFileAtLocolURL:location fromDownloadURL:downloadTask.originalRequest.URL];
-    [self trackDownloadTask:downloadTask];
+    FYFontFile *file = [self.fileDictionary objectForKey:downloadTask];
+    file.localURLString = location.absoluteString;
+    [[FYFontCache sharedFontCache] cacheFile:file]; // should cache immediately
+//    [self trackDownloadTask:downloadTask];
 }
 
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask
@@ -81,7 +88,9 @@
 
 - (void)trackDownloadTask:(NSURLSessionDownloadTask *)task {
     if (self.trackDownloadBlock) {
-        self.trackDownloadBlock([FYFontModel modelWithSessionDownloadTask:task]);
+        FYFontFile *file = [self.fileDictionary objectForKey:task];
+        file.downloadTask = task;
+        self.trackDownloadBlock(file);
     }
     if (task.state == NSURLSessionTaskStateCompleted) {
         [self freeTask:task];
@@ -89,8 +98,8 @@
 }
 
 - (void)freeTask:(NSURLSessionDownloadTask *)task {
-    [self.taskDictionary removeObjectForKey:task.originalRequest.URL];
     [task removeObserver:self forKeyPath:@"state"];
+    [self.fileDictionary removeObjectForKey:task];
 }
 
 #pragma mark - accessor
@@ -98,7 +107,7 @@
 - (NSURLSession *)session {
     if (!_session) {
         NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
-        configuration.timeoutIntervalForRequest = FYNewFontDownloadTimeoutIntervalForRequest;
+        configuration.timeoutIntervalForRequest = _timeoutInterval;
         _session = [NSURLSession sessionWithConfiguration:configuration
                                                  delegate:self
                                             delegateQueue:nil];
@@ -106,11 +115,11 @@
     return _session;
 }
 
-- (NSMutableDictionary<NSURL *, NSURLSessionDownloadTask *> *)taskDictionary {
-    if (!_taskDictionary) {
-        _taskDictionary = [NSMutableDictionary dictionary];
+- (NSMutableDictionary<NSURLSessionDownloadTask *, FYFontFile *> *)fileDictionary {
+    if (!_fileDictionary) {
+        _fileDictionary = [NSMutableDictionary dictionary];
     }
-    return _taskDictionary;
+    return _fileDictionary;
 }
 
 @end

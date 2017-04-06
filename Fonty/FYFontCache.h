@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "FYFontModel.h"
+#import "FYFontFile.h"
 
 @interface FYFontCache : NSObject
 
@@ -15,15 +15,14 @@
 
 + (instancetype)sharedFontCache;
 
-- (BOOL)cacheObject:(id)object cacheFileName:(NSString *)cacheFileName;
-- (instancetype)objectFromCacheWithFileName:(NSString *)cacheFileName;
+- (BOOL)cacheObject:(id)object fileName:(NSString *)fileName;
+- (instancetype)objectFromCacheWithFileName:(NSString *)fileName;
 
-- (NSString *)cachedFilePathWithDownloadURL:(NSURL *)downloadURL;
-- (void)cacheFileAtLocolURL:(NSURL *)locolURL fromDownloadURL:(NSURL *)downloadURL;
-- (void)cleanCachedFileWithDownloadURL:(NSURL *)downloadURL;
+- (BOOL)cacheFile:(FYFontFile *)file;
+- (BOOL)cleanCachedFile:(FYFontFile *)file;
 
 
-@property (nonatomic, copy) void(^didCleanFileBlock)(NSString *downloadURLString);
-@property (nonatomic, copy) void(^didCacheFileBlock)(NSString *downloadURLString);
+@property (nonatomic, copy) void(^didCleanFileBlock)(FYFontFile *file);
+@property (nonatomic, copy) void(^didCacheFileBlock)(FYFontFile *file);
 
 @end

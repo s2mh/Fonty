@@ -6,94 +6,28 @@
 //  Copyright © 2016 颜为晨. All rights reserved.
 //
 
-#import <objc/runtime.h>
-#import <objc/message.h>
+#import <UIKit/UIFont.h>
 #import "FYFontModel.h"
+#import "FYFontRegister.h"
 
 @implementation FYFontModel
 
-- (instancetype)init
-{
+- (instancetype)initWithCoder:(NSCoder *)decoder {
     self = [super init];
-    if (self) {
-        _downloadURL = nil;
-        _status = FYFontModelDownloadStatusToBeDownloaded;
-        _type = FYFontTypeFont;
-        _downloadProgress = 0.0f;
-        _postScriptName = @"";
-        _fileSize = 0.0f;
-        _fileSizeUnknown = NO;
-        _downloadError = nil;
+    if (!self) {
+        return nil;
     }
+    _postScriptName = [decoder decodeObjectForKey:@"_postScriptName"];
     return self;
 }
 
-+ (instancetype)modelWithSessionDownloadTask:(NSURLSessionDownloadTask *)task {
-    FYFontModel *model = [[FYFontModel alloc] init];
-    model.downloadURL = task.originalRequest.URL;
-    
-    model.fileDownloadedSize = task.countOfBytesReceived;
-    model.fileSize = task.countOfBytesExpectedToReceive;
-    
-    switch (task.state) {
-        case NSURLSessionTaskStateRunning: {
-            model.status = FYFontModelDownloadStatusDownloading;
-        } break;
-            
-        case NSURLSessionTaskStateSuspended: {
-            model.status = FYFontModelDownloadStatusSuspending;
-        } break;
-            
-        case NSURLSessionTaskStateCanceling: {
-            model.status = FYFontModelDownloadStatusDownloading;
-        } break;
-            
-        case NSURLSessionTaskStateCompleted: {
-            if (task.error) {
-                model.fileDownloadedSize = 0.0f;
-                model.status = FYFontModelDownloadStatusToBeDownloaded;
-                model.downloadError = task.error;
-            } else {
-                model.status = FYFontModelDownloadStatusDownloaded;
-                if (model.fileSize == NSURLSessionTransferSizeUnknown) {
-                    model.fileSize = model.fileDownloadedSize;
-                }
-            }
-        } break;
-    }
-    
-    if (model.fileSize > 0) {
-        model.downloadProgress = (double)model.fileDownloadedSize / model.fileSize;
-    } else {
-        model.downloadProgress = 0.0f;
-    }
-    model.fileSizeUnknown = (model.fileSize == NSURLSessionTransferSizeUnknown);
-    
-    return model;
-}
-
-- (void)setWithModel:(FYFontModel *)newModel {
-    unsigned int propertyCount = 0;
-    objc_property_t *properties = class_copyPropertyList([self class], &propertyCount);
-    for (unsigned int i = 0; i < propertyCount; i++) {
-        objc_property_t property = properties[i];
-        NSString *key = [NSString stringWithUTF8String:property_getName(property)];
-        if ([key isEqualToString:@"type"]) continue;
-        [self setValue:[newModel valueForKey:key] forKey:key];
-    }
+- (void)encodeWithCoder:(NSCoder *)encoder {
+    [encoder encodeObject:_postScriptName forKey:@"_postScriptName"];
 }
 
 - (NSString *)description
 {
-    if (self.downloadURL) {
-        return self.downloadURL.absoluteString;
-    } else {
-        switch (self.type) {
-            case FYFontTypeFont:        return @"Default Font";
-            case FYFontTypeBoldFont:    return @"Default Bold Font";
-            case FYFontTypeItalicFont:  return @"Default Italic Font";
-        }
-    }
+    return [NSString stringWithFormat:@"%@", self.postScriptName];
 }
 
 @end

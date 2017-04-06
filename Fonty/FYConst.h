@@ -12,7 +12,4 @@
 extern NSString *const FYFontStatusNotification;
 extern NSString *const FYFontStatusNotificationKey;
 
-extern NSTimeInterval const FYNewFontDownloadTimeoutIntervalForRequest;
-
-
 #endif /* FYConst_h */
