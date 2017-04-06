@@ -24,10 +24,14 @@
 + (void)pauseDownloadingFile:(FYFontFile *)file;
 + (void)deleteFontFile:(FYFontFile *)file;
 
-@property (class, weak) FYFontModel *mainFontModel;
++ (BOOL)registerFontFile:(FYFontFile *)file;
 
-@property (class, copy) NSArray<NSString *> *fileURLStrings;
-@property (class, copy, readonly) NSArray<FYFontFile *> *fontFiles;
+@property (nonatomic, class, copy) NSArray<NSString *> *fileURLStrings;
+@property (nonatomic, class, copy, readonly) NSArray<FYFontFile *> *fontFiles;
+@property (nonatomic, class, strong) UIFont *mainFont;
 
+
+//+ (UIFont *)mainFontWithSize:(CGFloat)size;
+//+ (void)setMainFont:(UIFont *)font;
 
 @end

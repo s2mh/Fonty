@@ -7,7 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "FYFontModel.h"
+
+@class FYFontModel;
 
 typedef NS_ENUM(NSUInteger, FYFontFileDownloadStatus) {
     FYFontFileDownloadStatusToBeDownloaded,
@@ -16,12 +17,12 @@ typedef NS_ENUM(NSUInteger, FYFontFileDownloadStatus) {
     FYFontFileDownloadStatusDownloaded,
 };
 
-@interface FYFontFile : NSObject <NSCopying>
+@interface FYFontFile : NSObject <NSCoding, NSCopying>
 
-@property (nonatomic, copy) NSURL *downloadURL;
-@property (nonatomic, copy) NSURL *localURL;
-
-@property (nonatomic, assign) BOOL cached;
+@property (nonatomic, copy) NSString *downloadURLString;
+@property (nonatomic, copy) NSString *localURLString;
+@property (nonatomic, copy) NSArray<FYFontModel *> *fontModels;
+@property (nonatomic, weak) NSURLSessionDownloadTask *downloadTask;
 @property (nonatomic, assign) BOOL registered;
 
 @property (nonatomic, assign, readonly) FYFontFileDownloadStatus downloadStatus;
@@ -31,10 +32,6 @@ typedef NS_ENUM(NSUInteger, FYFontFileDownloadStatus) {
 @property (nonatomic, assign, readonly) BOOL fileSizeUnknown;
 @property (nonatomic, copy, readonly) NSError *downloadError;
 
-@property (nonatomic, copy) NSArray<FYFontModel *> *fontModels;
-@property (atomic, strong) NSURLSessionDownloadTask *downloadTask;
-
-- (instancetype)initWithURLString:(NSString *)URLString;
 - (void)clear;
 
 @end

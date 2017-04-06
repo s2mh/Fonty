@@ -6,21 +6,23 @@
 //  Copyright © 2016 颜为晨. All rights reserved.
 //
 
-#import <objc/runtime.h>
-#import <objc/message.h>
+#import <UIKit/UIFont.h>
 #import "FYFontModel.h"
+#import "FYFontRegister.h"
 
 @implementation FYFontModel
 
-- (instancetype)init
-{
+- (instancetype)initWithCoder:(NSCoder *)decoder {
     self = [super init];
-    if (self) {
-        _type = FYFontTypeFont;
-        _font = nil;
-        _postScriptName = @"";
+    if (!self) {
+        return nil;
     }
+    _postScriptName = [decoder decodeObjectForKey:@"_postScriptName"];
     return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)encoder {
+    [encoder encodeObject:_postScriptName forKey:@"_postScriptName"];
 }
 
 - (NSString *)description

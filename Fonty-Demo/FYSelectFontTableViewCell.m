@@ -1,4 +1,3 @@
-
 //
 //  FYSelectFontTableViewCell.m
 //  Fonty
@@ -49,15 +48,11 @@ static const CGFloat StripeWidth = 20.0f;
     } else {
         [_stripesLayer removeFromSuperlayer];
         [self.layer addSublayer:self.progressLayer];
-    }
-}
-
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
-    [super setSelected:selected animated:animated];
-    if (selected) {
-        self.accessoryType = UITableViewCellAccessoryCheckmark;
-    } else {
-        self.accessoryType = UITableViewCellAccessoryNone;
+        if (self.pauseStripes) {
+            [self resumeLayer:self.progressLayer];
+        } else {
+            [self pauseLayer:self.progressLayer];
+        }
     }
 }
 
@@ -143,7 +138,15 @@ static const CGFloat StripeWidth = 20.0f;
         _progressLayer.fillColor = [UIColor grayColor].CGColor;
         _progressLayer.path = [UIBezierPath bezierPathWithRect:self.bounds].CGPath;
         _progressLayer.opacity = 0.5f;
-        _progressLayer.speed = 0.0f;
+        
+        CABasicAnimation *flicker = [CABasicAnimation animationWithKeyPath:@"fillColor"];
+        flicker.duration = 1.0;
+        flicker.repeatCount = HUGE_VALF;
+        flicker.removedOnCompletion = NO;
+        flicker.autoreverses = YES;
+        flicker.toValue = (id)[UIColor lightGrayColor].CGColor;
+        flicker.fromValue = (id)[UIColor grayColor].CGColor;
+        [_progressLayer addAnimation:flicker forKey:@"flicker"];
     }
     return _progressLayer;
 }

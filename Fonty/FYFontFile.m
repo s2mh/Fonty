@@ -7,18 +7,24 @@
 //
 
 #import "FYFontFile.h"
+#import "FYFontModel.h"
+#import "FYFontRegister.h"
 #import <objc/runtime.h>
 
 @interface FYFontFile ()
 
 @property (nonatomic, strong) dispatch_semaphore_t semaphore;
+
 @property (nonatomic, assign, readwrite) FYFontFileDownloadStatus downloadStatus;
+@property (nonatomic, assign, readwrite) int64_t fileSize;
+@property (nonatomic, assign, readwrite) int64_t fileDownloadedSize;
 @property (nonatomic, assign, readwrite) double downloadProgress;
+@property (nonatomic, assign, readwrite) BOOL fileSizeUnknown;
+@property (nonatomic, copy, readwrite) NSError *downloadError;
 
 @end
 
 @implementation FYFontFile
-@synthesize downloadTask = _downloadTask;
 
 - (id)copyWithZone:(nullable NSZone *)zone {
     FYFontFile *file = [FYFontFile allocWithZone:zone];
@@ -35,109 +41,93 @@
     return file;
 }
 
-- (instancetype)initWithURLString:(NSString *)URLString {
+- (instancetype)init {
     self = [super init];
     if (self) {
-        _downloadURL = [NSURL URLWithString:URLString];
-        _downloadTask = nil;
-        _localURL = nil;
+        _downloadURLString = nil;
+        _localURLString = nil;
         _downloadStatus = FYFontFileDownloadStatusToBeDownloaded;
-        _cached = NO;
         _registered = NO;
         _semaphore = dispatch_semaphore_create(1);
     }
     return self;
 }
 
+- (instancetype)initWithCoder:(NSCoder *)decoder {
+    self = [super init];
+    if (!self) {
+        return nil;
+    }
+    _downloadURLString = [decoder decodeObjectForKey:@"_downloadURLString"];
+    _localURLString = [decoder decodeObjectForKey:@"_localURLString"];
+    _downloadStatus = [decoder decodeIntegerForKey:@"_downloadStatus"];
+    _fileSize = [decoder decodeInt64ForKey:@"_fileSize"];
+    _downloadProgress = [decoder decodeDoubleForKey:@"_downloadProgress"];
+    _registered = NO;
+    _semaphore = dispatch_semaphore_create(1);
+    if (_downloadStatus == FYFontFileDownloadStatusDownloaded) {
+        _registered = [FYFontRegister registerFontInFile:self];
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)encoder {
+    [encoder encodeObject:_downloadURLString forKey:@"_downloadURLString"];
+    [encoder encodeObject:_localURLString forKey:@"_localURLString"];
+    [encoder encodeInteger:_downloadStatus forKey:@"_downloadStatus"];
+    [encoder encodeInt64:_fileSize forKey:@"_fileSize"];
+    [encoder encodeDouble:_downloadProgress forKey:@"_downloadProgress"];
+    [encoder encodeBool:_registered forKey:@"_registered"];
+    [encoder encodeObject:_fontModels forKey:@"_fontModels"];
+}
+
 - (void)clear {
-    self.localURL = nil;
-    self.downloadTask = nil;
-    self.cached = NO;
+    self.localURLString = nil;
     self.registered = NO;
+    self.downloadProgress = 0.0;
     self.downloadStatus = FYFontFileDownloadStatusToBeDownloaded;
 }
 
 #pragma mark - Accessor
 
-- (NSURLSessionDownloadTask *)downloadTask {
-    dispatch_semaphore_wait(_semaphore, DISPATCH_TIME_FOREVER);
-    dispatch_semaphore_signal(_semaphore);
-    return _downloadTask;
-}
-
 - (void)setDownloadTask:(NSURLSessionDownloadTask *)downloadTask {
-    if (_downloadTask != downloadTask) {
-        dispatch_semaphore_wait(_semaphore, DISPATCH_TIME_FOREVER);
-        _downloadTask = downloadTask;
-        dispatch_semaphore_signal(_semaphore);
-    }
-}
-
-- (FYFontFileDownloadStatus)downloadStatus {
     dispatch_semaphore_wait(_semaphore, DISPATCH_TIME_FOREVER);
-    if (_downloadTask) {
-        switch (_downloadTask.state) {
-            case NSURLSessionTaskStateRunning:
-            case NSURLSessionTaskStateCanceling: {
-                _downloadStatus = FYFontFileDownloadStatusDownloading;
-            } break;
-                
-            case NSURLSessionTaskStateSuspended: {
-                _downloadStatus = FYFontFileDownloadStatusSuspending;
-            } break;
-                
-            case NSURLSessionTaskStateCompleted: {
-                if (_downloadTask.error) {
-                    _downloadStatus = FYFontFileDownloadStatusToBeDownloaded;
-                } else {
-                    _downloadStatus = FYFontFileDownloadStatusDownloaded;
-                }
-            } break;
-        }
-    } else {
-        _downloadStatus = FYFontFileDownloadStatusToBeDownloaded;
+    _downloadTask = downloadTask;
+    switch (downloadTask.state) {
+        case NSURLSessionTaskStateRunning:
+        case NSURLSessionTaskStateCanceling: {
+            _downloadStatus = FYFontFileDownloadStatusDownloading;
+        } break;
+            
+        case NSURLSessionTaskStateSuspended: {
+            _downloadStatus = FYFontFileDownloadStatusSuspending;
+        } break;
+            
+        case NSURLSessionTaskStateCompleted: {
+            if (downloadTask.error) {
+                _downloadStatus = FYFontFileDownloadStatusToBeDownloaded;
+            } else {
+                _downloadStatus = FYFontFileDownloadStatusDownloaded;
+            }
+        } break;
     }
     
-    dispatch_semaphore_signal(_semaphore);
-    return _downloadStatus;
-}
-
-- (int64_t)fileSize {
-    dispatch_semaphore_wait(_semaphore, DISPATCH_TIME_FOREVER);
-    dispatch_semaphore_signal(_semaphore);
-    return (_downloadStatus == NSURLSessionTaskStateCompleted) ? _downloadTask.countOfBytesReceived : _downloadTask.countOfBytesExpectedToReceive;
-}
-
-- (int64_t)fileDownloadedSize {
-    dispatch_semaphore_wait(_semaphore, DISPATCH_TIME_FOREVER);
-    dispatch_semaphore_signal(_semaphore);
-    return _downloadTask.countOfBytesReceived;
-}
-
-- (double)downloadProgress {
-    dispatch_semaphore_wait(_semaphore, DISPATCH_TIME_FOREVER);
-    if (_downloadStatus == NSURLSessionTaskStateCompleted) {
+    _fileSize = (_downloadStatus == NSURLSessionTaskStateCompleted) ? downloadTask.countOfBytesReceived : downloadTask.countOfBytesExpectedToReceive;
+    _fileDownloadedSize = downloadTask.countOfBytesReceived;
+    
+    if (_downloadStatus == FYFontFileDownloadStatusDownloaded) {
         _downloadProgress = 1.0f;
     } else {
-        double downloadProgress = (double)_downloadTask.countOfBytesReceived / _downloadTask.countOfBytesExpectedToReceive;
+        double downloadProgress = (double)downloadTask.countOfBytesReceived / downloadTask.countOfBytesExpectedToReceive;
         if (downloadProgress > _downloadProgress) {
             _downloadProgress = downloadProgress;
         }
     }
+    
+    _fileSizeUnknown = (downloadTask.countOfBytesExpectedToReceive == NSURLSessionTransferSizeUnknown);
+    _downloadError = downloadTask.error;
+    
     dispatch_semaphore_signal(_semaphore);
-    return _downloadProgress;
-}
-
-- (BOOL)fileSizeUnknown {
-    dispatch_semaphore_wait(_semaphore, DISPATCH_TIME_FOREVER);
-    dispatch_semaphore_signal(_semaphore);
-    return _downloadTask.countOfBytesExpectedToReceive == NSURLSessionTransferSizeUnknown;
-}
-
-- (NSError *)downloadError {
-    dispatch_semaphore_wait(_semaphore, DISPATCH_TIME_FOREVER);
-    dispatch_semaphore_signal(_semaphore);
-    return _downloadTask.error;
 }
 
 @end

@@ -8,18 +8,12 @@
 
 #import <Foundation/Foundation.h>
 
-@class UIFont;
+@class UIFont, FYFontFile;
 
-typedef NS_ENUM(NSUInteger, FYFontType) {
-    FYFontTypeFont = 0,
-    FYFontTypeBoldFont,
-    FYFontTypeItalicFont,
-};
+@interface FYFontModel : NSObject <NSCoding>
 
-@interface FYFontModel : NSObject
-
-@property (nonatomic, assign) FYFontType type;
 @property (nonatomic, strong) UIFont *font;
 @property (nonatomic, copy) NSString *postScriptName;
+@property (nonatomic, weak) FYFontFile *fontFile;
 
 @end
