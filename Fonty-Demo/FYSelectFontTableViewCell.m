@@ -56,6 +56,15 @@ static const CGFloat StripeWidth = 20.0f;
     }
 }
 
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+    if (selected) {
+        self.accessoryType = UITableViewCellAccessoryCheckmark;
+    } else {
+        self.accessoryType = UITableViewCellAccessoryNone;
+    }
+}
+
 #pragma mark - Private
 
 - (void)pauseLayer:(CALayer *)layer {
@@ -140,7 +149,7 @@ static const CGFloat StripeWidth = 20.0f;
         _progressLayer.opacity = 0.5f;
         
         CABasicAnimation *flicker = [CABasicAnimation animationWithKeyPath:@"fillColor"];
-        flicker.duration = 1.0;
+        flicker.duration = 0.95;
         flicker.repeatCount = HUGE_VALF;
         flicker.removedOnCompletion = NO;
         flicker.autoreverses = YES;

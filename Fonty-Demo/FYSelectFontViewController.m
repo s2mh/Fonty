@@ -36,10 +36,12 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self.tableView registerClass:[FYSelectFontTableViewCell class] forCellReuseIdentifier:@"FYSelectFontTableViewCell"];
+    NSLog(@"kkkk %@", self.tableView.indexPathForSelectedRow);
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    NSLog(@"llll %@", self.tableView.indexPathForSelectedRow);
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(noticeDownload:)
                                                  name:FYFontStatusNotification
@@ -130,8 +132,9 @@
                 UIFont *font = model.font;
                 if ([font.fontName isEqualToString:[FYFontManager mainFont].fontName]) {
                     [FYFontManager setMainFont:nil];
-                    FYSelectFontTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-                    cell.accessoryType = UITableViewCellAccessoryNone;
+                    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+//                    FYSelectFontTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+//                    cell.accessoryType = UITableViewCellAccessoryNone;
                 } else {
                     [FYFontManager setMainFont:font];
                     return indexPath;
@@ -160,15 +163,15 @@
     return nil;
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    FYSelectFontTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-    cell.accessoryType = UITableViewCellAccessoryCheckmark;
-}
-
-- (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath {
-    FYSelectFontTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-    cell.accessoryType = UITableViewCellAccessoryNone;
-}
+//- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+//    FYSelectFontTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+//    cell.accessoryType = UITableViewCellAccessoryCheckmark;
+//}
+//
+//- (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath {
+//    FYSelectFontTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+//    cell.accessoryType = UITableViewCellAccessoryNone;
+//}
 
 - (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath {
     return @"Clear";
@@ -224,11 +227,13 @@
     cell.textLabel.text = model.postScriptName;
     cell.textLabel.font = font;
     cell.detailTextLabel.text = nil;
-    if ([font.fontName isEqualToString:[FYFontManager mainFont].fontName]) {
-        cell.accessoryType = UITableViewCellAccessoryCheckmark;
-    } else {
-        cell.accessoryType = UITableViewCellAccessoryNone;
-    }
+    cell.selected = [font.fontName isEqualToString:[FYFontManager mainFont].fontName];
+    NSLog(@"hhhhh %d", [font.fontName isEqualToString:[FYFontManager mainFont].fontName]);
+//    if ([font.fontName isEqualToString:[FYFontManager mainFont].fontName]) {
+//        cell.accessoryType = UITableViewCellAccessoryCheckmark;
+//    } else {
+//        cell.accessoryType = UITableViewCellAccessoryNone;
+//    }
     cell.downloadProgress = 1.0;
 }
 
@@ -238,7 +243,7 @@
     cell.textLabel.font = font;
     cell.detailTextLabel.text = nil;
     cell.selected = NO;
-    cell.accessoryType = UITableViewCellAccessoryNone;
+//    cell.accessoryType = UITableViewCellAccessoryNone;
     
     cell.downloadProgress = file.downloadProgress;
     cell.striped = NO;
