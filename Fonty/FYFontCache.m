@@ -9,7 +9,6 @@
 #import <CommonCrypto/CommonDigest.h>
 #import "FYFontCache.h"
 #import "FYFontDownloader.h"
-#import "FYConst.h"
 
 static NSString * const FYFontCacheDirectoryName = @"FYFont";
 
@@ -72,11 +71,9 @@ static NSString * const FYFontCacheDirectoryName = @"FYFont";
                               error:&error];
     if (!error) {
         file.localURLString = filePath;
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (self.didCacheFileBlock) {
-                self.didCacheFileBlock(file);
-            };
-        });
+        if (self.didCacheFileBlock) {
+            self.didCacheFileBlock(file);
+        };
         
         return YES;
     } else {

@@ -6,10 +6,11 @@
 //  Copyright © 2017年 s2mh. All rights reserved.
 //
 
+#import <objc/runtime.h>
+
 #import "FYFontFile.h"
 #import "FYFontModel.h"
 #import "FYFontRegister.h"
-#import <objc/runtime.h>
 
 @interface FYFontFile ()
 
@@ -74,6 +75,9 @@
 - (void)encodeWithCoder:(NSCoder *)encoder {
     [encoder encodeObject:_downloadURLString forKey:@"_downloadURLString"];
     [encoder encodeObject:_localURLString forKey:@"_localURLString"];
+    if ((_downloadStatus == FYFontFileDownloadStatusSuspending) || (_downloadStatus == FYFontFileDownloadStatusDownloading)) {
+        _downloadStatus = FYFontFileDownloadStatusToBeDownloaded;
+    }
     [encoder encodeInteger:_downloadStatus forKey:@"_downloadStatus"];
     [encoder encodeInt64:_fileSize forKey:@"_fileSize"];
     [encoder encodeDouble:_downloadProgress forKey:@"_downloadProgress"];
@@ -116,7 +120,7 @@
     _fileDownloadedSize = downloadTask.countOfBytesReceived;
     
     if (_downloadStatus == FYFontFileDownloadStatusDownloaded) {
-        _downloadProgress = 1.0f;
+        _downloadProgress = 1.0;
     } else {
         double downloadProgress = (double)downloadTask.countOfBytesReceived / downloadTask.countOfBytesExpectedToReceive;
         if (downloadProgress > _downloadProgress) {

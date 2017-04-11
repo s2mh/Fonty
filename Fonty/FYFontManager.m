@@ -9,6 +9,7 @@
 #import <objc/runtime.h>
 #import <objc/message.h>
 
+#import "FYConst.h"
 #import "FYFontManager.h"
 #import "FYFontCache.h"
 #import "FYFontRegister.h"
@@ -29,13 +30,6 @@ static NSString *const FYFontSharedManagerName = @"FYFontSharedManagerName";
 
 @implementation FYFontManager
 
-+ (void)initialize
-{
-    if (self == [FYFontManager class]) {
-        [self setup];
-    }
-}
-
 + (instancetype)sharedManager {
     static FYFontManager *manager;
     static dispatch_once_t onceToken;
@@ -44,15 +38,18 @@ static NSString *const FYFontSharedManagerName = @"FYFontSharedManagerName";
         if (!manager) {
             manager = [self new];
         }
+        [manager setup];
     });
     return manager;
 }
 
-+ (void)setup {
+- (void)setup {
     FYFontCache *fontCache = [FYFontCache sharedFontCache];
     fontCache.didCacheFileBlock = ^(FYFontFile *file) {
         if (file && [FYFontRegister registerFontInFile:file]) {
-            [FYFontManager postNotificationWithFile:file];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [FYFontManager postNotificationWithFile:file];
+            });
         }
     };
     

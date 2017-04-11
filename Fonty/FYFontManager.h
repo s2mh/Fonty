@@ -11,7 +11,6 @@
 
 #import "FYFontModel.h"
 #import "FYFontFile.h"
-#import "FYConst.h"
 
 @class FYFontModel;
 
@@ -29,9 +28,5 @@
 @property (nonatomic, class, copy) NSArray<NSString *> *fileURLStrings;
 @property (nonatomic, class, copy, readonly) NSArray<FYFontFile *> *fontFiles;
 @property (nonatomic, class, strong) UIFont *mainFont;
-
-
-//+ (UIFont *)mainFontWithSize:(CGFloat)size;
-//+ (void)setMainFont:(UIFont *)font;
 
 @end

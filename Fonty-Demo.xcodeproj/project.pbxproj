@@ -37,6 +37,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		52028CF31E9B7B3200848B89 /* Fonty.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Fonty.h; sourceTree = "<group>"; };
 		52F9EA1E1E88B78500D7EE30 /* FYFontFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FYFontFile.h; sourceTree = "<group>"; };
 		52F9EA1F1E88B78500D7EE30 /* FYFontFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FYFontFile.m; sourceTree = "<group>"; };
 		6A6F37851DE3001700E0B360 /* Fonty-DemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Fonty-DemoTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -149,6 +150,7 @@
 		6A73D6DA1D86C05000D38630 /* Fonty */ = {
 			isa = PBXGroup;
 			children = (
+				52028CF31E9B7B3200848B89 /* Fonty.h */,
 				6A8DD33F1D880322005C6E8E /* FYConst.h */,
 				6A8DD3401D880335005C6E8E /* FYConst.m */,
 				6A73D6DF1D86C05000D38630 /* FYFontManager.h */,

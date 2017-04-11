@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="15G1217" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="jEV-hr-FWw">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="15G1421" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="jEV-hr-FWw">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -28,7 +28,7 @@
         <!--例子 Example-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" sceneMemberID="viewController">
+                <viewController automaticallyAdjustsScrollViewInsets="NO" id="BYZ-38-t0r" customClass="ViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="y3c-jy-aDJ"/>
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
@@ -37,40 +37,35 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="dd8-SR-M3X">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="HL2-NM-afT">
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="UITableViewCell" textLabel="AWy-0b-7m0" style="IBUITableViewCellStyleDefault" id="7MQ-0e-jou">
-                                        <rect key="frame" x="0.0" y="28" width="375" height="44"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="7MQ-0e-jou" id="zr7-jZ-NNg">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="AWy-0b-7m0">
-                                                    <rect key="frame" x="15" y="0.0" width="345" height="43"/>
-                                                    <autoresizingMask key="autoresizingMask"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <nil key="textColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                            </subviews>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
-                                </prototypes>
-                                <connections>
-                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="xGr-wh-pm9"/>
-                                    <outlet property="delegate" destination="BYZ-38-t0r" id="Jb6-T3-ear"/>
-                                </connections>
-                            </tableView>
+                                <mutableString key="text">    // 点击右上角的按钮，可以进入管理页面。点击管理页面中的每一个cell，可以下载自定义字体。 
+
+    //  在AppDelegate的方法中添加字体文件的URL。
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [FYFontManager setFileURLStrings:@[@"https://github.com/s2mh/Fonty/raw/master/SourceFontFiles/SizeKnownFont.ttf",
+                                       @"http://115.28.28.235:8088/SizeUnknownFont.ttf",
+                                       @"https://github.com/s2mh/FontFile/raw/master/English/ttc/SnellRoundhand.ttc",
+                                       @"https://github.com/s2mh/FontFile/raw/master/Chinese/Traditional%20Chinese/ttc/Hannotate.ttc",
+                                       @"https://github.com/s2mh/Fonty/raw/master/SourceFontFiles/SizeKnownBoldFont.ttf",
+                                       @"http://115.28.28.235:8088/SizeUnknownBoldFont.otf",
+                                       @"https://github.com/s2mh/FontFile/raw/master/Chinese/Simplified%20Chinese/ttc/Baoli.ttc"]];
+    return YES;
+}
+
+    // 通过分类方法获得已下载和注册的字体。
+    self.exampleTextView.font = [UIFont fy_mainFontWithSize:17.0f];</mutableString>
+                                <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="dd8-SR-M3X" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="Var-hf-Z4X"/>
-                            <constraint firstAttribute="trailing" secondItem="dd8-SR-M3X" secondAttribute="trailing" id="aLh-Yp-G4B"/>
-                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="dd8-SR-M3X" secondAttribute="bottom" id="d0T-ad-rIA"/>
-                            <constraint firstItem="dd8-SR-M3X" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="tVA-39-g0K"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="HL2-NM-afT" secondAttribute="bottom" id="4dN-Wp-0E4"/>
+                            <constraint firstItem="HL2-NM-afT" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="WJp-Vc-iqj"/>
+                            <constraint firstItem="HL2-NM-afT" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" id="b73-wQ-1bI"/>
+                            <constraint firstAttribute="trailing" secondItem="HL2-NM-afT" secondAttribute="trailing" id="eV8-al-PhR"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="例子 Example" id="qIY-i7-AI9">
@@ -81,7 +76,7 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <outlet property="tableView" destination="dd8-SR-M3X" id="AlZ-hb-y4a"/>
+                        <outlet property="exampleTextView" destination="HL2-NM-afT" id="w9q-rh-7uW"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

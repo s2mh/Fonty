@@ -9,6 +9,8 @@
 #ifndef FYConst_h
 #define FYConst_h
 
+#import <Foundation/Foundation.h>
+
 extern NSString *const FYFontStatusNotification;
 extern NSString *const FYFontStatusNotificationKey;
 

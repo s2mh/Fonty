@@ -6,77 +6,25 @@
 //  Copyright © 2016 s2mh. All rights reserved.
 //
 
-#import "ViewController.h"
 #import <objc/message.h>
-#import "FYSelectFontViewController.h"
-#import "UIFont+FY_Fonty.h"
 
-static const CGFloat FontSize = 17.0f;
+#import "ViewController.h"
+#import "FYSelectFontViewController.h"
+
+#import "Fonty.h"
 
 @interface ViewController ()
 
-@property (weak, nonatomic) IBOutlet UITableView *tableView;
-
-@property (copy, nonatomic) NSArray<NSString *> *sectionHeaderTitleArray;
-
-@property (copy, nonatomic) NSArray<NSString *> *UIFontSelectorStringArray;
-@property (copy, nonatomic) NSArray<NSString *> *UIFontCategorySelectorStringArray;
-@property (copy, nonatomic) NSArray<NSString *> *FYFontManagerSelectorStringArray;
-
-@property (copy, nonatomic) NSArray<NSArray *> *arrayContainer;
+@property (weak, nonatomic) IBOutlet UITextView *exampleTextView;
 
 @end
 
 @implementation ViewController
 
-- (void)awakeFromNib {
-    [super awakeFromNib];
-    self.arrayContainer = @[self.UIFontSelectorStringArray = @[@"systemFontOfSize:",
-                                                               @"boldSystemFontOfSize:",
-                                                               @"italicSystemFontOfSize:"],
-                            self.UIFontCategorySelectorStringArray = @[@"fy_mainFontOfSize:",
-                                                                       @"fy_mainBoldFontOfSize:",
-                                                                       @"fy_mainItalicFontOfSize:"],
-                            self.FYFontManagerSelectorStringArray = @[@"mainFontOfSize:",
-                                                                      @"mainBoldFontOfSize:",
-                                                                      @"mainItalicFontOfSize:",
-                                                                      @"UIFontSystemFontOfSize:",
-                                                                      @"UIFontBoldSystemFontOfSize:",
-                                                                      @"UIFontItalicSystemFontOfSize:"]];
-    
-    self.sectionHeaderTitleArray = @[@"UIFont Selectors",
-                                     @"UIFont (FY_Fonty) Selectors",
-                                     @"FYFontManager Selectors"];
-}
-
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    [self.tableView reloadData];
-}
-
-#pragma mark - UITableViewDataSource
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return self.arrayContainer.count;
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.arrayContainer[section].count;
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSArray<NSString *> *selectStringArray = self.arrayContainer[indexPath.section];
-    NSString *selectorString = selectStringArray[indexPath.row];
-    
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"UITableViewCell" forIndexPath:indexPath];
-    cell.textLabel.font = [UIFont fy_mainFontWithSize:FontSize];
-    cell.textLabel.text = [NSString stringWithFormat:@"%@ 是这样的", selectorString];
-    return cell;
-}
-
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    return self.sectionHeaderTitleArray[section];
+    self.exampleTextView.font = [UIFont fy_mainFontWithSize:11.0f];
 }
 
 #pragma mark - Action

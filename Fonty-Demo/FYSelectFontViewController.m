@@ -10,12 +10,11 @@
 
 #import "FYSelectFontTableViewCell.h"
 
-#import "FYFontManager.h"
-#import "UIFont+FY_Fonty.h"
+#import "Fonty.h"
 
 @interface FYSelectFontViewController ()
 
-@property (copy, nonatomic) NSArray<FYFontFile *> *fontFiles;
+@property (weak, nonatomic) NSArray<FYFontFile *> *fontFiles;
 
 @end
 
@@ -36,16 +35,15 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self.tableView registerClass:[FYSelectFontTableViewCell class] forCellReuseIdentifier:@"FYSelectFontTableViewCell"];
-    NSLog(@"kkkk %@", self.tableView.indexPathForSelectedRow);
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    NSLog(@"llll %@", self.tableView.indexPathForSelectedRow);
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(noticeDownload:)
                                                  name:FYFontStatusNotification
                                                object:nil];
+    [self setupSelection];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -133,8 +131,6 @@
                 if ([font.fontName isEqualToString:[FYFontManager mainFont].fontName]) {
                     [FYFontManager setMainFont:nil];
                     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-//                    FYSelectFontTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-//                    cell.accessoryType = UITableViewCellAccessoryNone;
                 } else {
                     [FYFontManager setMainFont:font];
                     return indexPath;
@@ -162,16 +158,6 @@
     
     return nil;
 }
-
-//- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-//    FYSelectFontTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-//    cell.accessoryType = UITableViewCellAccessoryCheckmark;
-//}
-//
-//- (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath {
-//    FYSelectFontTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-//    cell.accessoryType = UITableViewCellAccessoryNone;
-//}
 
 - (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath {
     return @"Clear";
@@ -222,18 +208,35 @@
                                                                              action:@selector(backAction)];
 }
 
+- (void)setupSelection {
+    NSInteger section = -1;
+    NSInteger row     = -1;
+    UIFont *mainFont = [FYFontManager mainFont];
+    
+    for (NSInteger i = 0; i < self.fontFiles.count; i++) {
+        FYFontFile *file = self.fontFiles[i];
+        for (NSInteger j = 0; j < file.fontModels.count; j++) {
+            FYFontModel *model = file.fontModels[j];
+            if ([model.font.fontName isEqualToString:mainFont.fontName]) {
+                section = i;
+                row     = j;
+                goto foundSelection;
+            }
+        }
+    }
+    
+foundSelection:
+    if (section > -1) {
+        NSIndexPath *selectedIndexPath = [NSIndexPath indexPathForRow:row inSection:section];
+        [self.tableView selectRowAtIndexPath:selectedIndexPath animated:NO scrollPosition:UITableViewScrollPositionMiddle];
+    }
+}
+
 - (void)assembleCell:(FYSelectFontTableViewCell *)cell withModel:(FYFontModel *)model {
     UIFont *font = [UIFont fy_fontOfModel:model withSize:12.0f];
     cell.textLabel.text = model.postScriptName;
     cell.textLabel.font = font;
     cell.detailTextLabel.text = nil;
-    cell.selected = [font.fontName isEqualToString:[FYFontManager mainFont].fontName];
-    NSLog(@"hhhhh %d", [font.fontName isEqualToString:[FYFontManager mainFont].fontName]);
-//    if ([font.fontName isEqualToString:[FYFontManager mainFont].fontName]) {
-//        cell.accessoryType = UITableViewCellAccessoryCheckmark;
-//    } else {
-//        cell.accessoryType = UITableViewCellAccessoryNone;
-//    }
     cell.downloadProgress = 1.0;
 }
 
@@ -242,9 +245,6 @@
     cell.textLabel.text = file.downloadURLString;
     cell.textLabel.font = font;
     cell.detailTextLabel.text = nil;
-    cell.selected = NO;
-//    cell.accessoryType = UITableViewCellAccessoryNone;
-    
     cell.downloadProgress = file.downloadProgress;
     cell.striped = NO;
     cell.pauseStripes = NO;
