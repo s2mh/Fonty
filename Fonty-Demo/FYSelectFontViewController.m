@@ -40,8 +40,8 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(noticeDownload:)
-                                                 name:FYFontStatusNotification
+                                             selector:@selector(handleFile:)
+                                                 name:FYFontFileDidChangeNotification
                                                object:nil];
     [self setupSelection];
 }
@@ -77,20 +77,19 @@
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
     FYFontFile *file = self.fontFiles[indexPath.section];
-    return (file.downloadStatus == FYFontFileDownloadStatusDownloaded);
+    return (file.downloadStatus == FYFontFileDownloadStateDownloaded);
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         FYFontFile *file = self.fontFiles[indexPath.section];
         [FYFontManager deleteFontFile:file];
-        [self.tableView reloadData];
     }
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     FYFontFile *file = self.fontFiles[section];
-    return file.downloadURLString;
+    return file.sourceURLString;
 }
 
 #pragma mark UITableViewDelegate
@@ -98,9 +97,9 @@
 - (NSIndexPath *)tableView:(UITableView *)tableView willSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     FYFontFile *file = self.fontFiles[indexPath.section];
     switch (file.downloadStatus) {
-        case FYFontFileDownloadStatusToBeDownloaded: {
+        case FYFontFileDownloadStateToBeDownloaded: {
             UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Download Font File From"
-                                                                                     message:file.downloadURLString
+                                                                                     message:file.sourceURLString
                                                                               preferredStyle:UIAlertControllerStyleAlert];
             [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel"
                                                                 style:UIAlertActionStyleCancel
@@ -114,17 +113,17 @@
         }
             break;
             
-        case FYFontFileDownloadStatusDownloading: {
+        case FYFontFileDownloadStateDownloading: {
             [FYFontManager pauseDownloadingFile:file];
         }
             break;
             
-        case FYFontFileDownloadStatusSuspending: {
+        case FYFontFileDownloadStateSuspending: {
             [FYFontManager downloadFontFile:file];
         }
             break;
             
-        case FYFontFileDownloadStatusDownloaded: {
+        case FYFontFileDownloadStateDownloaded: {
             if (file.registered) {
                 FYFontModel *model = file.fontModels[indexPath.row];
                 UIFont *font = model.font;
@@ -165,31 +164,10 @@
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
     FYFontFile *file = self.fontFiles[indexPath.section];
-    if (file.downloadStatus == FYFontFileDownloadStatusDownloaded) {
+    if (file.downloadStatus == FYFontFileDownloadStateDownloaded) {
         return UITableViewCellEditingStyleDelete;
     } else {
         return UITableViewCellEditingStyleNone;
-    }
-}
-
-#pragma mark - Notification
-
-- (void)noticeDownload:(NSNotification *)notification {
-    FYFontFile *file = [notification.userInfo objectForKey:FYFontStatusNotificationKey];
-    NSInteger targetSection = [self.fontFiles indexOfObject:file];
-    if (file.registered) {
-        [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:targetSection]
-                      withRowAnimation:UITableViewRowAnimationAutomatic];
-    } else {
-        for (NSInteger row = 0; row < self.fontFiles.count; row++) {
-            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:targetSection];
-            if ([self.tableView.indexPathsForVisibleRows containsObject:indexPath]) {
-                FYSelectFontTableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
-                [self assembleCell:cell withFile:file];
-                [cell setNeedsLayout];
-                break;
-            }
-        }
     }
 }
 
@@ -199,7 +177,37 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
+#pragma mark - KVO
+
+- (void)handleFile:(NSNotification *)notification {
+    FYFontFile *file = [notification.userInfo objectForKey:FYFontFileDidChangeNotificationUserInfoKey];
+    if (file.registered) {
+        [self completeFile:file];
+    } else {
+        [self trackFile:file];
+    }
+}
+
 #pragma mark - Private
+
+- (void)trackFile:(FYFontFile *)file {
+    NSInteger targetSection = [self.fontFiles indexOfObject:file];
+    for (NSInteger row = 0; row < self.fontFiles.count; row++) {
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:targetSection];
+        if ([self.tableView.indexPathsForVisibleRows containsObject:indexPath]) {
+            FYSelectFontTableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
+            [self assembleCell:cell withFile:file];
+            [cell setNeedsLayout];
+            break;
+        }
+    }
+}
+
+- (void)completeFile:(FYFontFile *)file {
+    NSInteger targetSection = [self.fontFiles indexOfObject:file];
+    [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:targetSection]
+                  withRowAnimation:UITableViewRowAnimationAutomatic];
+}
 
 - (void)setupBarItems {
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Hide"
@@ -242,7 +250,7 @@ foundSelection:
 
 - (void)assembleCell:(FYSelectFontTableViewCell *)cell withFile:(FYFontFile *)file {
     UIFont *font = [UIFont systemFontOfSize:12.0f weight:10.0];
-    cell.textLabel.text = file.downloadURLString;
+    cell.textLabel.text = file.sourceURLString;
     cell.textLabel.font = font;
     cell.detailTextLabel.text = nil;
     cell.downloadProgress = file.downloadProgress;
@@ -250,19 +258,19 @@ foundSelection:
     cell.pauseStripes = NO;
     
     switch (file.downloadStatus) {
-        case FYFontFileDownloadStatusToBeDownloaded: {
+        case FYFontFileDownloadStateToBeDownloaded: {
             if (file.downloadError) {
                 cell.detailTextLabel.text = file.downloadError.localizedDescription;
             }
         }
             break;
             
-        case FYFontFileDownloadStatusDownloading: {
+        case FYFontFileDownloadStateDownloading: {
             cell.striped = file.fileSizeUnknown;
         }
             break;
             
-        case FYFontFileDownloadStatusSuspending: {
+        case FYFontFileDownloadStateSuspending: {
             cell.striped = file.fileSizeUnknown;
             cell.pauseStripes = YES;
         }
@@ -272,7 +280,11 @@ foundSelection:
             break;
     }
     if (file.fileSize > 0.0f) {
-        cell.detailTextLabel.text = [NSString stringWithFormat:@"size: %.2fM", file.fileSize / 1000000.0f];
+        if (file.fileSizeUnknown) {
+            cell.detailTextLabel.text = [NSString stringWithFormat:@"%.2fM / ?", file.fileDownloadedSize / 1000000.0f];
+        } else {
+            cell.detailTextLabel.text = [NSString stringWithFormat:@"%.2fM / %.2fM", file.fileDownloadedSize / 1000000.0f, file.fileSize / 1000000.0f];
+        }
     }
 }
 

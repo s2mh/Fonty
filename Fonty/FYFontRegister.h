@@ -14,12 +14,7 @@ extern NSString * const FYFontRegisterErrorPostScriptName;
 
 @interface FYFontRegister : NSObject
 
-//+ (instancetype)sharedRegister;
-
 + (BOOL)registerFontInFile:(FYFontFile *)file;
 + (BOOL)unregisterFontInFile:(FYFontFile *)file;
-
-//- (void)registerFontInFile:(FYFontFile *)file completeHandler:(void(^)(BOOL success))handler;
-//- (void)unregisterFontInFile:(FYFontFile *)file completeHandler:(void(^)(BOOL success))handler;
 
 @end

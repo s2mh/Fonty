@@ -10,18 +10,22 @@
 
 #import "FYFontFile.h"
 #import "FYFontModel.h"
+#import "FYFontCache.h"
 #import "FYFontRegister.h"
+#import "FYFontDownloader.h"
+#import "FYFontManager.h"
 
 @interface FYFontFile ()
 
-@property (nonatomic, strong) dispatch_semaphore_t semaphore;
-
-@property (nonatomic, assign, readwrite) FYFontFileDownloadStatus downloadStatus;
+@property (nonatomic, assign, readwrite) FYFontFileDownloadState downloadStatus;
 @property (nonatomic, assign, readwrite) int64_t fileSize;
 @property (nonatomic, assign, readwrite) int64_t fileDownloadedSize;
 @property (nonatomic, assign, readwrite) double downloadProgress;
 @property (nonatomic, assign, readwrite) BOOL fileSizeUnknown;
 @property (nonatomic, copy, readwrite) NSError *downloadError;
+@property (nonatomic, strong) NSLock *lock;
+
+@property (nonatomic, weak, readwrite) NSURLSessionDownloadTask *downloadTask;
 
 @end
 
@@ -42,14 +46,14 @@
     return file;
 }
 
-- (instancetype)init {
+- (instancetype)initWithSourceURLString:(NSString *)sourceURLString {
     self = [super init];
     if (self) {
-        _downloadURLString = nil;
+        _sourceURLString = sourceURLString;
         _localURLString = nil;
-        _downloadStatus = FYFontFileDownloadStatusToBeDownloaded;
+        _downloadStatus = FYFontFileDownloadStateToBeDownloaded;
         _registered = NO;
-        _semaphore = dispatch_semaphore_create(1);
+        _lock = [[NSLock alloc] init];
     }
     return self;
 }
@@ -59,24 +63,24 @@
     if (!self) {
         return nil;
     }
-    _downloadURLString = [decoder decodeObjectForKey:@"_downloadURLString"];
+    _sourceURLString = [decoder decodeObjectForKey:@"_sourceURLString"];
     _localURLString = [decoder decodeObjectForKey:@"_localURLString"];
     _downloadStatus = [decoder decodeIntegerForKey:@"_downloadStatus"];
     _fileSize = [decoder decodeInt64ForKey:@"_fileSize"];
     _downloadProgress = [decoder decodeDoubleForKey:@"_downloadProgress"];
     _registered = NO;
-    _semaphore = dispatch_semaphore_create(1);
-    if (_downloadStatus == FYFontFileDownloadStatusDownloaded) {
+    _lock = [[NSLock alloc] init];
+    if (_downloadStatus == FYFontFileDownloadStateDownloaded) {
         _registered = [FYFontRegister registerFontInFile:self];
     }
     return self;
 }
 
 - (void)encodeWithCoder:(NSCoder *)encoder {
-    [encoder encodeObject:_downloadURLString forKey:@"_downloadURLString"];
+    [encoder encodeObject:_sourceURLString forKey:@"_sourceURLString"];
     [encoder encodeObject:_localURLString forKey:@"_localURLString"];
-    if ((_downloadStatus == FYFontFileDownloadStatusSuspending) || (_downloadStatus == FYFontFileDownloadStatusDownloading)) {
-        _downloadStatus = FYFontFileDownloadStatusToBeDownloaded;
+    if ((_downloadStatus == FYFontFileDownloadStateSuspending) || (_downloadStatus == FYFontFileDownloadStateDownloading)) {
+        _downloadStatus = FYFontFileDownloadStateToBeDownloaded;
     }
     [encoder encodeInteger:_downloadStatus forKey:@"_downloadStatus"];
     [encoder encodeInt64:_fileSize forKey:@"_fileSize"];
@@ -85,53 +89,74 @@
     [encoder encodeObject:_fontModels forKey:@"_fontModels"];
 }
 
+#pragma mark - Public
+
 - (void)clear {
     self.localURLString = nil;
     self.registered = NO;
     self.downloadProgress = 0.0;
-    self.downloadStatus = FYFontFileDownloadStatusToBeDownloaded;
+    self.downloadStatus = FYFontFileDownloadStateToBeDownloaded;
 }
 
-#pragma mark - Accessor
-
-- (void)setDownloadTask:(NSURLSessionDownloadTask *)downloadTask {
-    dispatch_semaphore_wait(_semaphore, DISPATCH_TIME_FOREVER);
+- (void)resetWithDownloadTask:(NSURLSessionDownloadTask *)downloadTask {
+    [self.lock lock];
+    
     _downloadTask = downloadTask;
-    switch (downloadTask.state) {
+    
+    _fileSize = _downloadTask.countOfBytesExpectedToReceive;
+    _fileDownloadedSize = _downloadTask.countOfBytesReceived;
+    _fileSizeUnknown = (_fileSize == NSURLSessionTransferSizeUnknown);
+    _downloadError = _downloadTask.error;
+    _downloadProgress = 0.0;
+    
+    switch (_downloadTask.state) {
         case NSURLSessionTaskStateRunning:
         case NSURLSessionTaskStateCanceling: {
-            _downloadStatus = FYFontFileDownloadStatusDownloading;
+            _downloadStatus = FYFontFileDownloadStateDownloading;
         } break;
             
         case NSURLSessionTaskStateSuspended: {
-            _downloadStatus = FYFontFileDownloadStatusSuspending;
+            _downloadStatus = FYFontFileDownloadStateSuspending;
         } break;
             
         case NSURLSessionTaskStateCompleted: {
-            if (downloadTask.error) {
-                _downloadStatus = FYFontFileDownloadStatusToBeDownloaded;
+            if (_downloadError) {
+                _downloadStatus = FYFontFileDownloadStateToBeDownloaded;
             } else {
-                _downloadStatus = FYFontFileDownloadStatusDownloaded;
+                _downloadStatus = FYFontFileDownloadStateDownloaded;
             }
         } break;
     }
     
-    _fileSize = (_downloadStatus == NSURLSessionTaskStateCompleted) ? downloadTask.countOfBytesReceived : downloadTask.countOfBytesExpectedToReceive;
-    _fileDownloadedSize = downloadTask.countOfBytesReceived;
-    
-    if (_downloadStatus == FYFontFileDownloadStatusDownloaded) {
-        _downloadProgress = 1.0;
-    } else {
-        double downloadProgress = (double)downloadTask.countOfBytesReceived / downloadTask.countOfBytesExpectedToReceive;
+    if (!_fileSizeUnknown) {
+        double downloadProgress = (double)_fileDownloadedSize / _fileSize;
         if (downloadProgress > _downloadProgress) {
             _downloadProgress = downloadProgress;
         }
     }
     
-    _fileSizeUnknown = (downloadTask.countOfBytesExpectedToReceive == NSURLSessionTransferSizeUnknown);
-    _downloadError = downloadTask.error;
+    [self postSelf];
     
-    dispatch_semaphore_signal(_semaphore);
+    [self.lock unlock];
+}
+
+#pragma mark - Private
+
+- (void)postSelf {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:FYFontFileDidChangeNotification
+                                                            object:self
+                                                          userInfo:@{FYFontFileDidChangeNotificationUserInfoKey:self}];
+    });
+}
+
+#pragma mark - Accessor
+
+- (void)setRegistered:(BOOL)registered {
+    if (_registered != registered) {
+        _registered = registered;
+        [self postSelf];
+    }
 }
 
 @end

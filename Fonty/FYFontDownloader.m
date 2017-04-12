@@ -8,35 +8,30 @@
 
 #import "FYFontDownloader.h"
 #import "FYFontCache.h"
-#import "FYConst.h"
 #import "FYFontFile.h"
+#import "FYDownloadDelegate.h"
 
 @interface FYFontDownloader () <NSURLSessionDownloadDelegate>
 
 @property (nonatomic, strong) NSURLSession *session;
-@property (nonatomic, strong) NSMutableDictionary<NSNumber *, FYFontFile *> *downloadingFiles;
+@property (nonatomic, strong) NSLock *lock;
+@property (nonatomic, strong) NSMutableDictionary<NSNumber *, FYDownloadDelegate *> *delegates;
 
 @end
 
 @implementation FYFontDownloader
 
-+ (instancetype)sharedDownloader {
-    static id instance;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        instance = [self new];
-    });
-    return instance;
-}
-
-- (void)downloadFontFile:(FYFontFile *)file {
+- (void)downloadFontFile:(FYFontFile *)file progress:(void(^)(FYFontFile *file))progress completionHandler:(void(^)(NSError *))completionHandler {
     NSURLSessionDownloadTask *downloadTask = file.downloadTask;
     if (!downloadTask) {
-        downloadTask = [self.session downloadTaskWithURL:[NSURL URLWithString:file.downloadURLString]];
-        [downloadTask addObserver:self forKeyPath:@"state" options:NSKeyValueObservingOptionNew context:NULL];
-        file.downloadTask = downloadTask;
-        [self.downloadingFiles setObject:file
-                                  forKey:@(downloadTask.taskIdentifier)];
+        downloadTask = [self.session downloadTaskWithURL:[NSURL URLWithString:file.sourceURLString]];
+        
+        FYDownloadDelegate *delegate = [[FYDownloadDelegate alloc] init];
+        delegate.progress = progress;
+        delegate.completionHandler = completionHandler;
+        delegate.file = file;
+
+        [self setDelegate:delegate forTask:downloadTask];
     }
     if (downloadTask && (downloadTask.state == NSURLSessionTaskStateSuspended)) {
         [downloadTask resume];
@@ -58,49 +53,76 @@
     }
 }
 
-#pragma mark - KVO
+#pragma mark - NSURLSessionDownloadDelegate
 
-- (void)observeValueForKeyPath:(nullable NSString *)keyPath ofObject:(nullable id)object change:(nullable NSDictionary<NSKeyValueChangeKey, id> *)change context:(nullable void *)context {
-    if ([object isKindOfClass:[NSURLSessionDownloadTask class]]) {
-        [self trackDownloadTask:(NSURLSessionDownloadTask *)object];
+- (void)URLSession:(NSURLSession *)session
+      downloadTask:(NSURLSessionDownloadTask *)downloadTask
+      didWriteData:(int64_t)bytesWritten
+ totalBytesWritten:(int64_t)totalBytesWritten
+totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite {
+    FYDownloadDelegate *delegate = [self delegateForTask:downloadTask];
+    if (delegate) {
+        [delegate URLSession:session
+                downloadTask:downloadTask
+                didWriteData:bytesWritten
+           totalBytesWritten:totalBytesWritten
+   totalBytesExpectedToWrite:totalBytesExpectedToWrite];
     }
 }
 
-#pragma mark - NSURLSessionDownloadDelegate
-
-- (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask
-                                           didWriteData:(int64_t)bytesWritten
-                                      totalBytesWritten:(int64_t)totalBytesWritten
-                              totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite {
-    [self trackDownloadTask:downloadTask];
+- (void)URLSession:(NSURLSession *)session
+      downloadTask:(NSURLSessionDownloadTask *)downloadTask
+didFinishDownloadingToURL:(NSURL *)location {
+    FYDownloadDelegate *delegate = [self delegateForTask:downloadTask];
+    if (delegate) {
+        [delegate URLSession:session
+                downloadTask:downloadTask
+   didFinishDownloadingToURL:location];
+    }
 }
 
-- (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask
-                              didFinishDownloadingToURL:(NSURL *)location {
-    FYFontFile *file = [self.downloadingFiles objectForKey:@(downloadTask.taskIdentifier)];
-    file.localURLString = location.absoluteString;
-    [[FYFontCache sharedFontCache] cacheFile:file];
-}
-
-- (void)URLSession:(NSURLSession *)session task:(NSURLSessionDownloadTask *)task
-                           didCompleteWithError:(NSError *)error {
-    [self trackDownloadTask:task];
-    [self freeTask:task];
+- (void)URLSession:(NSURLSession *)session
+              task:(NSURLSessionDownloadTask *)task
+didCompleteWithError:(NSError *)error {
+    FYDownloadDelegate *delegate = [self delegateForTask:task];
+    if (delegate) {
+        [delegate URLSession:session
+                        task:task
+        didCompleteWithError:error];
+        [self removeDelegateForTask:task];
+    }
 }
 
 #pragma mark - Private
 
-- (void)trackDownloadTask:(NSURLSessionDownloadTask *)task {
-    if (self.trackDownloadBlock) {
-        FYFontFile *file = [self.downloadingFiles objectForKey:@(task.taskIdentifier)];
-        file.downloadTask = task;
-        self.trackDownloadBlock(file);
-    }
+- (FYDownloadDelegate *)delegateForTask:(NSURLSessionTask *)task {
+    NSParameterAssert(task);
+    
+    FYDownloadDelegate *delegate = nil;
+    [self.lock lock];
+    delegate = self.delegates[@(task.taskIdentifier)];
+    [self.lock unlock];
+    
+    return delegate;
 }
 
-- (void)freeTask:(NSURLSessionDownloadTask *)task {
-    [self.downloadingFiles removeObjectForKey:@(task.taskIdentifier)];
-    [task removeObserver:self forKeyPath:@"state"];
+- (void)setDelegate:(FYDownloadDelegate *)delegate
+            forTask:(NSURLSessionTask *)task
+{
+    NSParameterAssert(task);
+    NSParameterAssert(delegate);
+    
+    [self.lock lock];
+    self.delegates[@(task.taskIdentifier)] = delegate;
+    [self.lock unlock];
+}
+
+- (void)removeDelegateForTask:(NSURLSessionTask *)task {
+    NSParameterAssert(task);
+    
+    [self.lock lock];
+    [self.delegates removeObjectForKey:@(task.taskIdentifier)];
+    [self.lock unlock];
 }
 
 #pragma mark - accessor
@@ -116,11 +138,18 @@
     return _session;
 }
 
-- (NSMutableDictionary<NSNumber *, FYFontFile *> *)downloadingFiles {
-    if (!_downloadingFiles) {
-        _downloadingFiles = [NSMutableDictionary dictionary];
+- (NSLock *)lock {
+    if (!_lock) {
+        _lock = [[NSLock alloc] init];
     }
-    return _downloadingFiles;
+    return _lock;
+}
+
+- (NSMutableDictionary<NSNumber *, FYDownloadDelegate *> *)delegates {
+    if (!_delegates) {
+        _delegates = [NSMutableDictionary dictionary];
+    }
+    return _delegates;
 }
 
 @end

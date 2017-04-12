@@ -9,15 +9,9 @@
 #ifndef Fonty_h
 #define Fonty_h
 
-#import "UIFont+FY_Fonty.h"
-
-#import "FYConst.h"
 #import "FYFontManager.h"
-#import "FYFontCache.h"
-#import "FYFontRegister.h"
-#import "FyFontDownloader.h"
-
 #import "FYFontFile.h"
 #import "FYFontModel.h"
+#import "UIFont+FY_Fonty.h"
 
 #endif /* Fonty_h */

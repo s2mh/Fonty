@@ -65,9 +65,6 @@ NSString * const FYFontRegisterErrorPostScriptName = @"FYFontRegisterErrorPostSc
         }
         CFRelease(fontURL);
         CFRelease(fontPath);
-        if (success) {
-            file.registered = NO;
-        }
     }
     return success;
 }

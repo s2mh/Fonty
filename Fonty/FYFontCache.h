@@ -11,18 +11,10 @@
 
 @interface FYFontCache : NSObject
 
-@property (nonatomic, copy, readonly) NSString *diskCacheDirectoryPath;
++ (BOOL)cacheObject:(id)object fileName:(NSString *)fileName;
++ (id)objectFromCacheWithFileName:(NSString *)fileName;
 
-+ (instancetype)sharedFontCache;
-
-- (BOOL)cacheObject:(id)object fileName:(NSString *)fileName;
-- (instancetype)objectFromCacheWithFileName:(NSString *)fileName;
-
-- (BOOL)cacheFile:(FYFontFile *)file;
-- (BOOL)cleanCachedFile:(FYFontFile *)file;
-
-
-@property (nonatomic, copy) void(^didCleanFileBlock)(FYFontFile *file);
-@property (nonatomic, copy) void(^didCacheFileBlock)(FYFontFile *file);
++ (void)cacheFile:(FYFontFile *)file atLocation:(NSURL *)location completionHandler:(void(^)(NSError *error))completionHandler ;
++ (void)cleanCachedFile:(FYFontFile *)file completionHandler:(void(^)(NSError *error))completionHandler;
 
 @end
