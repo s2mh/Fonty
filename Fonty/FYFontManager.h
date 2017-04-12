@@ -30,7 +30,6 @@ extern NSString *const FYFontFileDidChangeNotificationUserInfoKey;
 + (void)deleteFontFile:(FYFontFile *)file;
 + (void)deleteFontFile:(FYFontFile *)file
      completionHandler:(void(^)(NSError *error))completionHandler;
-
 + (BOOL)registerFontFile:(FYFontFile *)file;
 
 @property (nonatomic, class, copy) NSArray<NSString *> *fileURLStrings;

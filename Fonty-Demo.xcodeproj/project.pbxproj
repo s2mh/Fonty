@@ -151,22 +151,22 @@
 			isa = PBXGroup;
 			children = (
 				52028CF31E9B7B3200848B89 /* Fonty.h */,
+				52F9EA1E1E88B78500D7EE30 /* FYFontFile.h */,
+				52F9EA1F1E88B78500D7EE30 /* FYFontFile.m */,
+				6A73D6E11D86C05000D38630 /* FYFontModel.h */,
+				6A73D6E21D86C05000D38630 /* FYFontModel.m */,
 				6A73D6DF1D86C05000D38630 /* FYFontManager.h */,
 				6A73D6E01D86C05000D38630 /* FYFontManager.m */,
 				6A73D6DD1D86C05000D38630 /* FYFontDownloader.h */,
 				6A73D6DE1D86C05000D38630 /* FYFontDownloader.m */,
+				523C70341E9E003100845940 /* FYDownloadDelegate.h */,
+				523C70351E9E003100845940 /* FYDownloadDelegate.m */,
 				6A73D6DB1D86C05000D38630 /* FYFontCache.h */,
 				6A73D6DC1D86C05000D38630 /* FYFontCache.m */,
 				6A73D6E31D86C05000D38630 /* FYFontRegister.h */,
 				6A73D6E41D86C05000D38630 /* FYFontRegister.m */,
-				6A73D6E11D86C05000D38630 /* FYFontModel.h */,
-				6A73D6E21D86C05000D38630 /* FYFontModel.m */,
 				6A73D6E61D86C05000D38630 /* UIFont+FY_Fonty.h */,
 				6A73D6E71D86C05000D38630 /* UIFont+FY_Fonty.m */,
-				52F9EA1E1E88B78500D7EE30 /* FYFontFile.h */,
-				52F9EA1F1E88B78500D7EE30 /* FYFontFile.m */,
-				523C70341E9E003100845940 /* FYDownloadDelegate.h */,
-				523C70351E9E003100845940 /* FYDownloadDelegate.m */,
 			);
 			path = Fonty;
 			sourceTree = "<group>";

@@ -45,26 +45,6 @@ NSString *const FYFontFileDidChangeNotificationUserInfoKey = @"FYFontFileDidChan
     return manager;
 }
 
-+ (UIFont *)mainFont {
-    FYFontManager *sharedManager = [FYFontManager sharedManager];
-    if (sharedManager.mainFont) {
-        return sharedManager.mainFont;
-    } else {
-        UIFont *font = [UIFont fontWithName:sharedManager.mainFontName size:10.0f];
-        if (sharedManager.mainFontName && ![font.fontName isEqualToString:sharedManager.mainFontName] && sharedManager.mainFontFile.downloadStatus == FYFontFileDownloadStateDownloaded) {
-            [FYFontRegister registerFontInFile:sharedManager.mainFontFile];
-            font = [UIFont fontWithName:sharedManager.mainFontName size:10.0f];
-        }
-        return font;
-    }
-}
-
-+ (void)setMainFont:(UIFont *)mainFont {
-    FYFontManager *sharedManager = [FYFontManager sharedManager];
-    sharedManager.mainFont = mainFont;
-    sharedManager.mainFontName = mainFont.fontName;
-}
-
 - (instancetype)initWithCoder:(NSCoder *)decoder {
     self = [super init];
     if (!self) {
@@ -190,6 +170,26 @@ NSString *const FYFontFileDidChangeNotificationUserInfoKey = @"FYFontFileDidChan
 }
 
 #pragma mark - Accessor
+
++ (UIFont *)mainFont {
+    FYFontManager *sharedManager = [FYFontManager sharedManager];
+    if (sharedManager.mainFont) {
+        return sharedManager.mainFont;
+    } else {
+        UIFont *font = [UIFont fontWithName:sharedManager.mainFontName size:10.0f];
+        if (sharedManager.mainFontName && ![font.fontName isEqualToString:sharedManager.mainFontName] && sharedManager.mainFontFile.downloadStatus == FYFontFileDownloadStateDownloaded) {
+            [FYFontRegister registerFontInFile:sharedManager.mainFontFile];
+            font = [UIFont fontWithName:sharedManager.mainFontName size:10.0f];
+        }
+        return font;
+    }
+}
+
++ (void)setMainFont:(UIFont *)mainFont {
+    FYFontManager *sharedManager = [FYFontManager sharedManager];
+    sharedManager.mainFont = mainFont;
+    sharedManager.mainFontName = mainFont.fontName;
+}
 
 - (FYFontDownloader *)downloader {
     if (!_downloader) {
