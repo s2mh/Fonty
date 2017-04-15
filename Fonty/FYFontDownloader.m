@@ -21,12 +21,14 @@
 
 @implementation FYFontDownloader
 
-- (void)downloadFontFile:(FYFontFile *)file progress:(void(^)(FYFontFile *file))progress completionHandler:(void(^)(NSError *))completionHandler {
+- (void)downloadFontFile:(FYFontFile *)file
+                progress:(void(^)(FYFontFile *file))progress
+       completionHandler:(void(^)(NSError *))completionHandler {
     NSURLSessionDownloadTask *downloadTask = file.downloadTask;
     if (!downloadTask) {
         downloadTask = [self.session downloadTaskWithURL:[NSURL URLWithString:file.sourceURLString]];
         
-        FYDownloadDelegate *delegate = [[FYDownloadDelegate alloc] init];
+        FYDownloadDelegate *delegate = [[FYDownloadDelegate alloc] initWithTask:downloadTask];
         delegate.progress = progress;
         delegate.completionHandler = completionHandler;
         delegate.file = file;

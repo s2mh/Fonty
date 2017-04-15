@@ -58,6 +58,7 @@ completion:
 + (void)cleanCachedFile:(FYFontFile *)file completionHandler:(void(^)(NSError *))completionHandler {
     NSError *error = nil;
     [[NSFileManager defaultManager] removeItemAtPath:file.localURLString error:&error];
+    
     if (completionHandler) {
         completionHandler(error);
     }

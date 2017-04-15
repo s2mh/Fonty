@@ -118,13 +118,16 @@ NSString *const FYFontFileDidChangeNotificationUserInfoKey = @"FYFontFileDidChan
 + (void)deleteFontFile:(FYFontFile *)file completionHandler:(void(^)(NSError *))completionHandler {
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     dispatch_async(queue, ^{
-        if ([FYFontRegister unregisterFontInFile:file]) {
-            file.registered = NO;
-        }
+        [FYFontRegister unregisterFontInFile:file];
         [FYFontCache cleanCachedFile:file completionHandler:^(NSError *error) {
-            if (!error) {
-                [file clear];
+            UIFont *mainFont = [FYFontManager mainFont];
+            for (FYFontModel *model in file.fontModels) {
+                if ([model.font isEqual:mainFont]) {
+                    [FYFontManager setMainFont:nil];
+                    break;
+                }
             }
+            [file clear];
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (completionHandler) {
                     completionHandler(error);

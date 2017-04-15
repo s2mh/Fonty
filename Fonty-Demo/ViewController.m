@@ -15,7 +15,7 @@
 
 @interface ViewController ()
 
-@property (weak, nonatomic) IBOutlet UITextView *exampleTextView;
+@property (weak, nonatomic) IBOutlet UITextView *textView;
 
 @end
 
@@ -24,7 +24,7 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    self.exampleTextView.font = [UIFont fy_mainFontWithSize:11.0f];
+    self.textView.font = [UIFont fy_mainFontWithSize:38.0f];
 }
 
 #pragma mark - Action

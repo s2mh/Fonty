@@ -31,20 +31,20 @@
 
 @implementation FYFontFile
 
-- (id)copyWithZone:(nullable NSZone *)zone {
-    FYFontFile *file = [FYFontFile allocWithZone:zone];
-    
-    unsigned int propertyCount = 0;
-    objc_property_t *properties = class_copyPropertyList([self class], &propertyCount);
-    for (unsigned int i = 0; i < propertyCount; i++) {
-        objc_property_t property = properties[i];
-        NSString *key = [NSString stringWithUTF8String:property_getName(property)];
-        if ([key isEqualToString:@"type"]) continue;
-        [file setValue:[self valueForKey:key] forKey:key];
-    }
-    
-    return file;
-}
+//- (id)copyWithZone:(nullable NSZone *)zone {
+//    FYFontFile *file = [FYFontFile allocWithZone:zone];
+//    
+//    unsigned int propertyCount = 0;
+//    objc_property_t *properties = class_copyPropertyList([self class], &propertyCount);
+//    for (unsigned int i = 0; i < propertyCount; i++) {
+//        objc_property_t property = properties[i];
+//        NSString *key = [NSString stringWithUTF8String:property_getName(property)];
+//        if ([key isEqualToString:@"type"]) continue;
+//        [file setValue:[self valueForKey:key] forKey:key];
+//    }
+//    
+//    return file;
+//}
 
 - (instancetype)initWithSourceURLString:(NSString *)sourceURLString {
     self = [super init];
@@ -72,6 +72,9 @@
     _lock = [[NSLock alloc] init];
     if (_downloadStatus == FYFontFileDownloadStateDownloaded) {
         _registered = [FYFontRegister registerFontInFile:self];
+        if (!_registered) {
+            [self clear];
+        }
     }
     return self;
 }
@@ -92,10 +95,14 @@
 #pragma mark - Public
 
 - (void)clear {
+    [self.lock lock];
     self.localURLString = nil;
     self.registered = NO;
     self.downloadProgress = 0.0;
     self.downloadStatus = FYFontFileDownloadStateToBeDownloaded;
+    self.fontModels = nil;
+    [self.lock unlock];
+    [self postSelf];
 }
 
 - (void)resetWithDownloadTask:(NSURLSessionDownloadTask *)downloadTask {
@@ -134,10 +141,9 @@
             _downloadProgress = downloadProgress;
         }
     }
+    [self.lock unlock];
     
     [self postSelf];
-    
-    [self.lock unlock];
 }
 
 #pragma mark - Private

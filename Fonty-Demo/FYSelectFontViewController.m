@@ -88,8 +88,7 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    FYFontFile *file = self.fontFiles[section];
-    return file.sourceURLString;
+    return [NSString stringWithFormat:@"Font file %ld", (long)section + 1];
 }
 
 #pragma mark UITableViewDelegate
@@ -177,11 +176,11 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-#pragma mark - KVO
+#pragma mark - Notification
 
 - (void)handleFile:(NSNotification *)notification {
     FYFontFile *file = [notification.userInfo objectForKey:FYFontFileDidChangeNotificationUserInfoKey];
-    if (file.registered) {
+    if (file.registered || file.downloadProgress == 0.0) {
         [self completeFile:file];
     } else {
         [self trackFile:file];

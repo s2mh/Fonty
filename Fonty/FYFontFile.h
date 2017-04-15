@@ -17,7 +17,7 @@ typedef NS_ENUM(NSUInteger, FYFontFileDownloadState) {
     FYFontFileDownloadStateDownloaded,
 };
 
-@interface FYFontFile : NSObject <NSCoding, NSCopying>
+@interface FYFontFile : NSObject <NSCoding>
 
 - (instancetype)initWithSourceURLString:(NSString *)sourceURLString;
 

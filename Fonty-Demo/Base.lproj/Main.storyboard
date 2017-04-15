@@ -25,7 +25,7 @@
             </objects>
             <point key="canvasLocation" x="-713" y="229"/>
         </scene>
-        <!--例子 Example-->
+        <!--View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
                 <viewController automaticallyAdjustsScrollViewInsets="NO" id="BYZ-38-t0r" customClass="ViewController" sceneMemberID="viewController">
@@ -37,26 +37,14 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="HL2-NM-afT">
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="HL2-NM-afT">
                                 <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <mutableString key="text">    // 点击右上角的按钮，可以进入管理页面。点击管理页面中的每一个cell，可以下载自定义字体。 
-
-    //  在AppDelegate的方法中添加字体文件的URL。
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [FYFontManager setFileURLStrings:@[@"https://github.com/s2mh/Fonty/raw/master/SourceFontFiles/SizeKnownFont.ttf",
-                                       @"http://115.28.28.235:8088/SizeUnknownFont.ttf",
-                                       @"https://github.com/s2mh/FontFile/raw/master/English/ttc/SnellRoundhand.ttc",
-                                       @"https://github.com/s2mh/FontFile/raw/master/Chinese/Traditional%20Chinese/ttc/Hannotate.ttc",
-                                       @"https://github.com/s2mh/Fonty/raw/master/SourceFontFiles/SizeKnownBoldFont.ttf",
-                                       @"http://115.28.28.235:8088/SizeUnknownBoldFont.otf",
-                                       @"https://github.com/s2mh/FontFile/raw/master/Chinese/Simplified%20Chinese/ttc/Baoli.ttc"]];
-    return YES;
-}
-
-    // 通过分类方法获得已下载和注册的字体。
-    self.exampleTextView.font = [UIFont fy_mainFontWithSize:17.0f];</mutableString>
-                                <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                                <string key="text">
+汉字
+    
+English</string>
+                                <fontDescription key="fontDescription" type="system" pointSize="38"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                         </subviews>
@@ -68,7 +56,7 @@
                             <constraint firstAttribute="trailing" secondItem="HL2-NM-afT" secondAttribute="trailing" id="eV8-al-PhR"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="例子 Example" id="qIY-i7-AI9">
+                    <navigationItem key="navigationItem" id="qIY-i7-AI9">
                         <barButtonItem key="rightBarButtonItem" title="Fonty" id="4p7-Q5-KVU">
                             <connections>
                                 <action selector="barButtonItemAction:" destination="BYZ-38-t0r" id="sC8-Fj-Izp"/>
@@ -76,7 +64,7 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <outlet property="exampleTextView" destination="HL2-NM-afT" id="w9q-rh-7uW"/>
+                        <outlet property="textView" destination="HL2-NM-afT" id="neU-8E-gBe"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
