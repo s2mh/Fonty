@@ -32,10 +32,15 @@ end
 在AppDelegate中，将准备好的字体文件地址配置给Fonty：
 
 ```objective-c
-[FYFontManager setFileURLStrings:@[@"https://github.com/s2mh/FontFile/raw/master/Chinese/Simplified%20Chinese/ttc/Xingkai.ttc",
-@"https://github.com/s2mh/FontFile/raw/master/Common/Bold/LiHeiPro.ttf",
-@"https://github.com/s2mh/FontFile/raw/master/English/Bold/Luminari.ttf",
-@"https://github.com/s2mh/FontFile/raw/master/Common/Regular/YuppySC-Regular.otf"]];
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    ...
+    [FYFontManager setFileURLStrings:@[@"https://github.com/s2mh/FontFile/raw/master/Chinese/Simplified%20Chinese/ttc/Xingkai.ttc",
+                                       @"https://github.com/s2mh/FontFile/raw/master/Common/Bold/LiHeiPro.ttf",
+                                       @"https://github.com/s2mh/FontFile/raw/master/English/Bold/Luminari.ttf",
+                                       @"https://github.com/s2mh/FontFile/raw/master/Common/Regular/YuppySC-Regular.otf"]];
+    
+    return YES;
+}
 ```
 
 FYFontManager（用于管理字体文件）会据此生成对应的FYFontFile对象（用于描述字体文件信息）：
