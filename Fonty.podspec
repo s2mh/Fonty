@@ -16,8 +16,8 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "Fonty"
-  s.version      = "1.2.1"
-  s.summary      = "A dynamic font framework for iOS."
+  s.version      = "2.0.0"
+  s.summary      = "A thirdparty font management framework for iOS apps."
 
   # This description is used to generate tags and improve search results.
   #   * Think: What does it do? Why did you write it? What is the focus?
@@ -29,7 +29,7 @@ Pod::Spec.new do |s|
                    DESC
 
   s.homepage     = "https://github.com/s2mh/Fonty"
-  s.screenshots  = "https://github.com/s2mh/Fonty/raw/master/Screenshot/Fonty-Demo.gif"
+  # s.screenshots  = "https://github.com/s2mh/Fonty/raw/master/Screenshot/Fonty-Demo.gif"
 
 
   # ―――  Spec License  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -53,7 +53,7 @@ Pod::Spec.new do |s|
   #  profile URL.
   #
 
-  s.author             = { "" => "s2mh@qq.com" }
+  s.author             = { "" => "417495814@qq.com" }
   # Or just: s.author    = ""
   # s.authors            = { "" => "s2mh@qq.com" }
   # s.social_media_url   = "http://twitter.com/"
@@ -65,7 +65,7 @@ Pod::Spec.new do |s|
   #
 
   # s.platform     = :ios
-  s.platform     = :ios, "7.0"
+  s.platform     = :ios, "8.0"
 
   #  When using multiple platforms
   # s.ios.deployment_target = "5.0"
@@ -95,7 +95,7 @@ Pod::Spec.new do |s|
   # s.source_files  = "Classes", "Classes/**/*.{h,m}"
   # s.exclude_files = "Classes/Exclude"
 
-  # s.public_header_files = "Classes/**/*.h"
+  s.public_header_files = "Fonty/*.{h}"
 
 
   # ――― Resources ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
