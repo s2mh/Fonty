@@ -1,7 +1,5 @@
-#Fonty
+# Fonty
 [![Build Status](https://travis-ci.org/s2mh/Fonty.svg?branch=master)](https://travis-ci.org/s2mh/Fonty)
-
-第三方字体管理库 [Fonty](https://github.com/s2mh/Fonty)
 
 # 使用场景
 
