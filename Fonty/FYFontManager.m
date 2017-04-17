@@ -10,13 +10,17 @@
 #import <objc/message.h>
 
 #import "FYFontManager.h"
+#import "FYFontFile.h"
 #import "FYFontCache.h"
 #import "FYFontRegister.h"
 #import "FYFontDownloader.h"
 
 static NSString *const FYFontSharedManagerName = @"FYFontSharedManagerName";
-NSString *const FYFontFileDidChangeNotification = @"FYFontFileDidChangeNotification";
-NSString *const FYFontFileDidChangeNotificationUserInfoKey = @"FYFontFileDidChangeNotificationUserInfoKey";
+NSString *const FYFontFileDownloadingNotification = @"FYFontFileDownloadingNotification";
+NSString *const FYFontFileDownloadingDidCompleteNotification = @"FYFontFileDownloadingDidCompleteNotification";
+NSString *const FYFontFileRegisteringDidCompleteNotification = @"FYFontFileRegisteringDidCompleteNotification";
+NSString *const FYFontFileDeletingDidCompleteNotification = @"FYFontFileDeletingDidCompleteNotification";
+NSString *const FYFontFileNotificationUserInfoKey = @"FYFontFileNotificationUserInfoKey";
 
 @interface FYFontManager () <NSCoding>
 
@@ -64,15 +68,15 @@ NSString *const FYFontFileDidChangeNotificationUserInfoKey = @"FYFontFileDidChan
 
 #pragma mark - Private
 
-+ (void)saveSettins {
-    [[FYFontManager sharedManager] cacheSelf];
-}
-
 - (void)cacheSelf {
     [FYFontCache cacheObject:self fileName:FYFontSharedManagerName];
 }
 
 #pragma mark - Public
+
++ (void)archive {
+    [[FYFontManager sharedManager] cacheSelf];
+}
 
 + (void)downloadFontFile:(FYFontFile *)file {
     [self downloadFontFile:file progress:nil completionHandler:nil];

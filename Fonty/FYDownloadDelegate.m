@@ -9,6 +9,7 @@
 #import "FYDownloadDelegate.h"
 #import "FYFontFile.h"
 #import "FYFontCache.h"
+#import "FYFontManager.h"
 
 @interface FYDownloadDelegate ()
 
@@ -47,6 +48,11 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite {
     if (self.progress) {
         self.progress(self.file);
     };
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:FYFontFileDownloadingNotification
+                                                            object:nil
+                                                          userInfo:@{FYFontFileNotificationUserInfoKey:self.file}];
+    });
 }
 
 - (void)URLSession:(NSURLSession *)session
@@ -61,7 +67,13 @@ didFinishDownloadingToURL:(NSURL *)location {
               task:(NSURLSessionDownloadTask *)task
 didCompleteWithError:(NSError *)error {
     [self.file resetWithDownloadTask:task];
+    
     if (error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:FYFontFileDownloadingDidCompleteNotification
+                                                                object:nil
+                                                              userInfo:@{FYFontFileNotificationUserInfoKey:self.file}];
+        });
         if (self.completionHandler) {
             self.completionHandler(error);
         }

@@ -40,8 +40,16 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(handleFile:)
-                                                 name:FYFontFileDidChangeNotification
+                                             selector:@selector(trackFile:)
+                                                 name:FYFontFileDownloadingNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(completeFile:)
+                                                 name:FYFontFileRegisteringDidCompleteNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(completeFile:)
+                                                 name:FYFontFileDeletingDidCompleteNotification
                                                object:nil];
     [self setupSelection];
 }
@@ -49,7 +57,7 @@
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [FYFontManager saveSettins];
+    [FYFontManager archive];
 }
 
 #pragma mark - UITableViewDataSource
@@ -178,18 +186,8 @@
 
 #pragma mark - Notification
 
-- (void)handleFile:(NSNotification *)notification {
-    FYFontFile *file = [notification.userInfo objectForKey:FYFontFileDidChangeNotificationUserInfoKey];
-    if (file.registered || file.downloadProgress == 0.0) {
-        [self completeFile:file];
-    } else {
-        [self trackFile:file];
-    }
-}
-
-#pragma mark - Private
-
-- (void)trackFile:(FYFontFile *)file {
+- (void)trackFile:(NSNotification *)notification {
+    FYFontFile *file = [notification.userInfo objectForKey:FYFontFileNotificationUserInfoKey];
     NSInteger targetSection = [self.fontFiles indexOfObject:file];
     for (NSInteger row = 0; row < self.fontFiles.count; row++) {
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:targetSection];
@@ -202,7 +200,8 @@
     }
 }
 
-- (void)completeFile:(FYFontFile *)file {
+- (void)completeFile:(NSNotification *)notification {
+    FYFontFile *file = [notification.userInfo objectForKey:FYFontFileNotificationUserInfoKey];
     NSInteger targetSection = [self.fontFiles indexOfObject:file];
     [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:targetSection]
                   withRowAnimation:UITableViewRowAnimationAutomatic];

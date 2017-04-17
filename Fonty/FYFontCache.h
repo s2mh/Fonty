@@ -7,7 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "FYFontFile.h"
+
+@class FYFontFile;
 
 @interface FYFontCache : NSObject
 
@@ -16,5 +17,7 @@
 
 + (void)cacheFile:(FYFontFile *)file atLocation:(NSURL *)location completionHandler:(void(^)(NSError *error))completionHandler ;
 + (void)cleanCachedFile:(FYFontFile *)file completionHandler:(void(^)(NSError *error))completionHandler;
+
++ (NSString *)diskCacheDirectoryPath;
 
 @end

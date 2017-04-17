@@ -6,16 +6,19 @@
 //  Copyright © 2016 颜为晨. All rights reserved.
 //
 
-#import <CoreText/CoreText.h>
 #import <UIKit/UIKit.h>
+#import <CoreText/CoreText.h>
+
 #import "FYFontRegister.h"
+#import "FYFontManager.h"
+#import "FYFontFile.h"
 
 NSString * const FYFontRegisterErrorPostScriptName = @"FYFontRegisterErrorPostScriptName";
 
 @implementation FYFontRegister
 
 + (BOOL)registerFontInFile:(FYFontFile *)file {
-    CFStringRef fontPath = CFStringCreateWithCString(NULL, [file.localURLString UTF8String], kCFStringEncodingUTF8);
+    CFStringRef fontPath = CFStringCreateWithCString(NULL, [file.localPath UTF8String], kCFStringEncodingUTF8);
     CFURLRef fontURL = CFURLCreateWithFileSystemPath(NULL, fontPath, kCFURLPOSIXPathStyle, 0);
     CFErrorRef error = NULL;
     CTFontManagerRegisterFontsForURL(fontURL, kCTFontManagerScopeNone, &error);
@@ -52,13 +55,20 @@ NSString * const FYFontRegisterErrorPostScriptName = @"FYFontRegisterErrorPostSc
     }
     CFRelease(fontURL);
     CFRelease(fontPath);
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:FYFontFileRegisteringDidCompleteNotification
+                                                            object:nil
+                                                          userInfo:@{FYFontFileNotificationUserInfoKey:file}];
+    });
+    
     return YES;
 }
 
 + (BOOL)unregisterFontInFile:(FYFontFile *)file {
     BOOL success = YES;
-    if (file.localURLString) {
-        CFStringRef fontPath = CFStringCreateWithCString(NULL, [file.localURLString UTF8String], kCFStringEncodingUTF8);
+    if (file.localPath) {
+        CFStringRef fontPath = CFStringCreateWithCString(NULL, [file.localPath UTF8String], kCFStringEncodingUTF8);
         CFURLRef fontURL = CFURLCreateWithFileSystemPath(NULL, fontPath, kCFURLPOSIXPathStyle, 0);
         if (fontURL) {
             success = CTFontManagerUnregisterFontsForURL(fontURL, kCTFontManagerScopeNone, NULL);

@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "FYFontManager.h"
+#import "Fonty.h"
 
 @interface UIFont (FY_Fonty)
 

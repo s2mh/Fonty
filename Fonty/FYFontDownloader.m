@@ -132,7 +132,7 @@ didCompleteWithError:(NSError *)error {
 - (NSURLSession *)session {
     if (!_session) {
         NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
-        configuration.timeoutIntervalForRequest = _timeoutInterval;
+//        configuration.timeoutIntervalForRequest = 180;
         _session = [NSURLSession sessionWithConfiguration:configuration
                                                  delegate:self
                                             delegateQueue:nil];

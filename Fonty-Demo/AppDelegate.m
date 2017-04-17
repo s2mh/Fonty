@@ -19,8 +19,7 @@
     [FYFontManager setFileURLStrings:@[@"https://github.com/s2mh/FontFile/raw/master/Chinese/Simplified%20Chinese/ttc/Xingkai.ttc",
                                        @"https://github.com/s2mh/FontFile/raw/master/Common/Bold/LiHeiPro.ttf",
                                        @"https://github.com/s2mh/FontFile/raw/master/English/Bold/Luminari.ttf",
-                                       @"https://github.com/s2mh/FontFile/raw/master/Common/Regular/YuppySC-Regular.otf",
-                                       @"https://github.com/s2mh/FontFile/raw/master/Common/Regular/YuppyTC-Regular.otf"]];
+                                       @"https://github.com/s2mh/FontFile/raw/master/Common/Regular/YuppySC-Regular.otf"]];
     
     return YES;
 }

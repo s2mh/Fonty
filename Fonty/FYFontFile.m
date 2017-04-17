@@ -9,7 +9,6 @@
 #import <objc/runtime.h>
 
 #import "FYFontFile.h"
-#import "FYFontModel.h"
 #import "FYFontCache.h"
 #import "FYFontRegister.h"
 #import "FYFontDownloader.h"
@@ -17,6 +16,7 @@
 
 @interface FYFontFile ()
 
+@property (nonatomic, copy, readwrite) NSString *sourceURLString;
 @property (nonatomic, assign, readwrite) FYFontFileDownloadState downloadStatus;
 @property (nonatomic, assign, readwrite) int64_t fileSize;
 @property (nonatomic, assign, readwrite) int64_t fileDownloadedSize;
@@ -24,33 +24,16 @@
 @property (nonatomic, assign, readwrite) BOOL fileSizeUnknown;
 @property (nonatomic, copy, readwrite) NSError *downloadError;
 @property (nonatomic, strong) NSLock *lock;
-
 @property (nonatomic, weak, readwrite) NSURLSessionDownloadTask *downloadTask;
 
 @end
 
 @implementation FYFontFile
 
-//- (id)copyWithZone:(nullable NSZone *)zone {
-//    FYFontFile *file = [FYFontFile allocWithZone:zone];
-//    
-//    unsigned int propertyCount = 0;
-//    objc_property_t *properties = class_copyPropertyList([self class], &propertyCount);
-//    for (unsigned int i = 0; i < propertyCount; i++) {
-//        objc_property_t property = properties[i];
-//        NSString *key = [NSString stringWithUTF8String:property_getName(property)];
-//        if ([key isEqualToString:@"type"]) continue;
-//        [file setValue:[self valueForKey:key] forKey:key];
-//    }
-//    
-//    return file;
-//}
-
 - (instancetype)initWithSourceURLString:(NSString *)sourceURLString {
     self = [super init];
     if (self) {
         _sourceURLString = sourceURLString;
-        _localURLString = nil;
         _downloadStatus = FYFontFileDownloadStateToBeDownloaded;
         _registered = NO;
         _lock = [[NSLock alloc] init];
@@ -64,7 +47,8 @@
         return nil;
     }
     _sourceURLString = [decoder decodeObjectForKey:@"_sourceURLString"];
-    _localURLString = [decoder decodeObjectForKey:@"_localURLString"];
+    _fileName = [decoder decodeObjectForKey:@"_fileName"];
+    _localPath = [[FYFontCache diskCacheDirectoryPath] stringByAppendingPathComponent:_fileName];
     _downloadStatus = [decoder decodeIntegerForKey:@"_downloadStatus"];
     _fileSize = [decoder decodeInt64ForKey:@"_fileSize"];
     _downloadProgress = [decoder decodeDoubleForKey:@"_downloadProgress"];
@@ -81,7 +65,7 @@
 
 - (void)encodeWithCoder:(NSCoder *)encoder {
     [encoder encodeObject:_sourceURLString forKey:@"_sourceURLString"];
-    [encoder encodeObject:_localURLString forKey:@"_localURLString"];
+    [encoder encodeObject:_fileName forKey:@"_fileName"];
     if ((_downloadStatus == FYFontFileDownloadStateSuspending) || (_downloadStatus == FYFontFileDownloadStateDownloading)) {
         _downloadStatus = FYFontFileDownloadStateToBeDownloaded;
     }
@@ -96,13 +80,13 @@
 
 - (void)clear {
     [self.lock lock];
-    self.localURLString = nil;
+    self.localPath = nil;
+    self.fileName = nil;
     self.registered = NO;
     self.downloadProgress = 0.0;
     self.downloadStatus = FYFontFileDownloadStateToBeDownloaded;
     self.fontModels = nil;
     [self.lock unlock];
-    [self postSelf];
 }
 
 - (void)resetWithDownloadTask:(NSURLSessionDownloadTask *)downloadTask {
@@ -142,27 +126,28 @@
         }
     }
     [self.lock unlock];
-    
-    [self postSelf];
 }
 
-#pragma mark - Private
+@end
 
-- (void)postSelf {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:FYFontFileDidChangeNotification
-                                                            object:self
-                                                          userInfo:@{FYFontFileDidChangeNotificationUserInfoKey:self}];
-    });
-}
+@implementation FYFontModel
 
-#pragma mark - Accessor
-
-- (void)setRegistered:(BOOL)registered {
-    if (_registered != registered) {
-        _registered = registered;
-        [self postSelf];
+- (instancetype)initWithCoder:(NSCoder *)decoder {
+    self = [super init];
+    if (!self) {
+        return nil;
     }
+    _postScriptName = [decoder decodeObjectForKey:@"_postScriptName"];
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)encoder {
+    [encoder encodeObject:_postScriptName forKey:@"_postScriptName"];
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"%@", self.postScriptName];
 }
 
 @end

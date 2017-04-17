@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class FYFontModel;
+@class FYFontModel, UIFont;
 
 typedef NS_ENUM(NSUInteger, FYFontFileDownloadState) {
     FYFontFileDownloadStateToBeDownloaded,
@@ -21,9 +21,7 @@ typedef NS_ENUM(NSUInteger, FYFontFileDownloadState) {
 
 - (instancetype)initWithSourceURLString:(NSString *)sourceURLString;
 
-@property (nonatomic, copy) NSString *sourceURLString;
-@property (nonatomic, copy) NSString *localURLString;
-@property (nonatomic, copy) NSArray<FYFontModel *> *fontModels;
+@property (nonatomic, copy, readonly) NSString *sourceURLString;
 @property (nonatomic, assign) BOOL registered;
 @property (nonatomic, assign, readonly) FYFontFileDownloadState downloadStatus;
 @property (nonatomic, assign, readonly) int64_t fileSize;
@@ -33,7 +31,19 @@ typedef NS_ENUM(NSUInteger, FYFontFileDownloadState) {
 @property (nonatomic, copy, readonly) NSError *downloadError;
 @property (nonatomic, weak, readonly) NSURLSessionDownloadTask *downloadTask;
 
+@property (nonatomic, copy) NSString *localPath;
+@property (nonatomic, copy) NSString *fileName;
+@property (nonatomic, copy) NSArray<FYFontModel *> *fontModels;
+
 - (void)clear;
 - (void)resetWithDownloadTask:(NSURLSessionDownloadTask *)downloadTask;
+
+@end
+
+@interface FYFontModel : NSObject <NSCoding>
+
+@property (nonatomic, strong) UIFont *font;
+@property (nonatomic, copy) NSString *postScriptName;
+@property (nonatomic, weak) FYFontFile *fontFile;
 
 @end

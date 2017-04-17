@@ -9,17 +9,17 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-#import "FYFontModel.h"
-#import "FYFontFile.h"
+@class FYFontFile, FYFontModel;
 
-@class FYFontModel;
-
-extern NSString *const FYFontFileDidChangeNotification;
-extern NSString *const FYFontFileDidChangeNotificationUserInfoKey;
+extern NSString *const FYFontFileDownloadingNotification;
+extern NSString *const FYFontFileDownloadingDidCompleteNotification;
+extern NSString *const FYFontFileRegisteringDidCompleteNotification;
+extern NSString *const FYFontFileDeletingDidCompleteNotification;
+extern NSString *const FYFontFileNotificationUserInfoKey;
 
 @interface FYFontManager : NSObject
 
-+ (void)saveSettins;
++ (void)archive;
 
 + (void)downloadFontFile:(FYFontFile *)file;
 + (void)downloadFontFile:(FYFontFile *)file

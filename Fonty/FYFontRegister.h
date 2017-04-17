@@ -7,8 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "FYFontModel.h"
-#import "FYFontFile.h"
+
+@class FYFontFile;
 
 extern NSString * const FYFontRegisterErrorPostScriptName;
 

@@ -11,7 +11,6 @@
 
 #import "FYFontManager.h"
 #import "FYFontFile.h"
-#import "FYFontModel.h"
 #import "UIFont+FY_Fonty.h"
 
 #endif /* Fonty_h */

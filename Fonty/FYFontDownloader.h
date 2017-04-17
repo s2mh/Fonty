@@ -12,10 +12,6 @@
 
 @interface FYFontDownloader : NSObject
 
-//+ (instancetype)sharedDownloader;
-
-@property (nonatomic, assign) NSTimeInterval timeoutInterval;
-
 - (void)downloadFontFile:(FYFontFile *)file progress:(void(^)(FYFontFile *file))progress completionHandler:(void(^)(NSError *error))completionHandler;
 - (void)cancelDownloadingFile:(FYFontFile *)file;
 - (void)suspendDownloadFile:(FYFontFile *)file;
