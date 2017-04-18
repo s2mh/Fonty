@@ -15,21 +15,20 @@
 #import "FYFontRegister.h"
 #import "FYFontDownloader.h"
 
-static NSString *const FYFontSharedManagerName = @"FYFontSharedManagerName";
 NSString *const FYFontFileDownloadingNotification = @"FYFontFileDownloadingNotification";
+NSString *const FYFontFileDownloadStateDidChangeNotification = @"FYFontFileDownloadStateDidChangeNotification";
 NSString *const FYFontFileDownloadingDidCompleteNotification = @"FYFontFileDownloadingDidCompleteNotification";
 NSString *const FYFontFileRegisteringDidCompleteNotification = @"FYFontFileRegisteringDidCompleteNotification";
 NSString *const FYFontFileDeletingDidCompleteNotification = @"FYFontFileDeletingDidCompleteNotification";
 NSString *const FYFontFileNotificationUserInfoKey = @"FYFontFileNotificationUserInfoKey";
+static NSString *const FYFontSharedManagerName = @"FYFontSharedManagerName";
 
 @interface FYFontManager () <NSCoding>
 
 @property (nonatomic, strong) FYFontDownloader *downloader;
-
 @property (nonatomic, copy) NSArray<NSString *> *URLStrings;
 @property (nonatomic, copy) NSArray<FYFontFile *> *fontFiles;
-
-@property (nonatomic, strong) FYFontFile *mainFontFile;
+@property (nonatomic, weak) FYFontFile *mainFontFile;
 @property (nonatomic, copy) NSString *mainFontName;
 @property (nonatomic, strong) UIFont *mainFont;
 
@@ -68,14 +67,14 @@ NSString *const FYFontFileNotificationUserInfoKey = @"FYFontFileNotificationUser
 
 #pragma mark - Private
 
-- (void)cacheSelf {
+- (void)archiveSelf {
     [FYFontCache cacheObject:self fileName:FYFontSharedManagerName];
 }
 
 #pragma mark - Public
 
 + (void)archive {
-    [[FYFontManager sharedManager] cacheSelf];
+    [[FYFontManager sharedManager] archiveSelf];
 }
 
 + (void)downloadFontFile:(FYFontFile *)file {
@@ -164,6 +163,10 @@ NSString *const FYFontFileNotificationUserInfoKey = @"FYFontFileNotificationUser
             } else {
                 FYFontFile *file = oldFontFiles[index];
                 [fontFiles addObject:file];
+                if ((file.downloadStatus == FYFontFileDownloadStateDownloaded) &&
+                    [file.fileName isEqualToString:sharedManager.mainFontName]) {
+                    sharedManager.mainFontFile = file;
+                }
             }
         }];
         
@@ -180,16 +183,15 @@ NSString *const FYFontFileNotificationUserInfoKey = @"FYFontFileNotificationUser
 
 + (UIFont *)mainFont {
     FYFontManager *sharedManager = [FYFontManager sharedManager];
-    if (sharedManager.mainFont) {
-        return sharedManager.mainFont;
-    } else {
-        UIFont *font = [UIFont fontWithName:sharedManager.mainFontName size:10.0f];
-        if (sharedManager.mainFontName && ![font.fontName isEqualToString:sharedManager.mainFontName] && sharedManager.mainFontFile.downloadStatus == FYFontFileDownloadStateDownloaded) {
+    if (!sharedManager.mainFont) {
+        if (sharedManager.mainFontFile) {
             [FYFontRegister registerFontInFile:sharedManager.mainFontFile];
-            font = [UIFont fontWithName:sharedManager.mainFontName size:10.0f];
+            sharedManager.mainFont = [UIFont fontWithName:sharedManager.mainFontName size:17.0];
+        } else {
+            sharedManager.mainFont = [UIFont systemFontOfSize:17.0];
         }
-        return font;
     }
+    return sharedManager.mainFont;
 }
 
 + (void)setMainFont:(UIFont *)mainFont {

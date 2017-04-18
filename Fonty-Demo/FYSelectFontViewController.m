@@ -40,15 +40,18 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(trackFile:)
+                                             selector:@selector(layoutCellWithNotification:)
                                                  name:FYFontFileDownloadingNotification
                                                object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(completeFile:)
+                                             selector:@selector(layoutCellWithNotification:)
+                                                 name:FYFontFileDownloadStateDidChangeNotification                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(reloadRowWithNotification:)
                                                  name:FYFontFileRegisteringDidCompleteNotification
                                                object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(completeFile:)
+                                             selector:@selector(reloadRowWithNotification:)
                                                  name:FYFontFileDeletingDidCompleteNotification
                                                object:nil];
     [self setupSelection];
@@ -125,7 +128,7 @@
         }
             break;
             
-        case FYFontFileDownloadStateSuspending: {
+        case FYFontFileDownloadStateSuspended: {
             [FYFontManager downloadFontFile:file];
         }
             break;
@@ -186,7 +189,7 @@
 
 #pragma mark - Notification
 
-- (void)trackFile:(NSNotification *)notification {
+- (void)layoutCellWithNotification:(NSNotification *)notification {
     FYFontFile *file = [notification.userInfo objectForKey:FYFontFileNotificationUserInfoKey];
     NSInteger targetSection = [self.fontFiles indexOfObject:file];
     for (NSInteger row = 0; row < self.fontFiles.count; row++) {
@@ -200,12 +203,14 @@
     }
 }
 
-- (void)completeFile:(NSNotification *)notification {
+- (void)reloadRowWithNotification:(NSNotification *)notification {
     FYFontFile *file = [notification.userInfo objectForKey:FYFontFileNotificationUserInfoKey];
     NSInteger targetSection = [self.fontFiles indexOfObject:file];
     [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:targetSection]
                   withRowAnimation:UITableViewRowAnimationAutomatic];
 }
+
+#pragma mark - Private
 
 - (void)setupBarItems {
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Hide"
@@ -268,7 +273,7 @@ foundSelection:
         }
             break;
             
-        case FYFontFileDownloadStateSuspending: {
+        case FYFontFileDownloadStateSuspended: {
             cell.striped = file.fileSizeUnknown;
             cell.pauseStripes = YES;
         }

@@ -12,6 +12,7 @@
 @class FYFontFile, FYFontModel;
 
 extern NSString *const FYFontFileDownloadingNotification;
+extern NSString *const FYFontFileDownloadStateDidChangeNotification;
 extern NSString *const FYFontFileDownloadingDidCompleteNotification;
 extern NSString *const FYFontFileRegisteringDidCompleteNotification;
 extern NSString *const FYFontFileDeletingDidCompleteNotification;
@@ -32,8 +33,8 @@ extern NSString *const FYFontFileNotificationUserInfoKey;
      completionHandler:(void(^)(NSError *error))completionHandler;
 + (BOOL)registerFontFile:(FYFontFile *)file;
 
-@property (nonatomic, class, copy) NSArray<NSString *> *fileURLStrings;
-@property (nonatomic, class, copy, readonly) NSArray<FYFontFile *> *fontFiles;
-@property (nonatomic, class, strong) UIFont *mainFont;
+@property (class, nonatomic, copy) NSArray<NSString *> *fileURLStrings;
+@property (class, nonatomic, copy, readonly) NSArray<FYFontFile *> *fontFiles;
+@property (class, nonatomic, strong) UIFont *mainFont;
 
 @end

@@ -24,7 +24,7 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    self.textView.font = [UIFont fy_mainFontWithSize:38.0f];
+    self.textView.font = [UIFont fy_mainFontWithSize:39.0f];
 }
 
 #pragma mark - Action

@@ -116,6 +116,10 @@ didCompleteWithError:(NSError *)error {
     
     [self.lock lock];
     self.delegates[@(task.taskIdentifier)] = delegate;
+    [task addObserver:delegate
+           forKeyPath:@"state"
+              options:NSKeyValueObservingOptionNew
+              context:NULL];
     [self.lock unlock];
 }
 
@@ -123,16 +127,16 @@ didCompleteWithError:(NSError *)error {
     NSParameterAssert(task);
     
     [self.lock lock];
+    [task removeObserver:self.delegates[@(task.taskIdentifier)] forKeyPath:@"state"];
     [self.delegates removeObjectForKey:@(task.taskIdentifier)];
     [self.lock unlock];
 }
 
-#pragma mark - accessor
+#pragma mark - Accessor
 
 - (NSURLSession *)session {
     if (!_session) {
         NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
-//        configuration.timeoutIntervalForRequest = 180;
         _session = [NSURLSession sessionWithConfiguration:configuration
                                                  delegate:self
                                             delegateQueue:nil];

@@ -66,7 +66,7 @@
 - (void)encodeWithCoder:(NSCoder *)encoder {
     [encoder encodeObject:_sourceURLString forKey:@"_sourceURLString"];
     [encoder encodeObject:_fileName forKey:@"_fileName"];
-    if ((_downloadStatus == FYFontFileDownloadStateSuspending) || (_downloadStatus == FYFontFileDownloadStateDownloading)) {
+    if ((_downloadStatus == FYFontFileDownloadStateSuspended) || (_downloadStatus == FYFontFileDownloadStateDownloading)) {
         _downloadStatus = FYFontFileDownloadStateToBeDownloaded;
     }
     [encoder encodeInteger:_downloadStatus forKey:@"_downloadStatus"];
@@ -101,18 +101,23 @@
     _downloadProgress = 0.0;
     
     switch (_downloadTask.state) {
-        case NSURLSessionTaskStateRunning:
-        case NSURLSessionTaskStateCanceling: {
+        case NSURLSessionTaskStateRunning: {
             _downloadStatus = FYFontFileDownloadStateDownloading;
         } break;
             
         case NSURLSessionTaskStateSuspended: {
-            _downloadStatus = FYFontFileDownloadStateSuspending;
+            _downloadStatus = FYFontFileDownloadStateSuspended;
+        } break;
+            
+        case NSURLSessionTaskStateCanceling: {
+            _downloadStatus = FYFontFileDownloadStateToBeDownloaded;
+            _fileDownloadedSize = 0.0;
         } break;
             
         case NSURLSessionTaskStateCompleted: {
             if (_downloadError) {
                 _downloadStatus = FYFontFileDownloadStateToBeDownloaded;
+                _fileDownloadedSize = 0.0;
             } else {
                 _downloadStatus = FYFontFileDownloadStateDownloaded;
             }
@@ -121,7 +126,7 @@
     
     if (!_fileSizeUnknown) {
         double downloadProgress = (double)_fileDownloadedSize / _fileSize;
-        if (downloadProgress > _downloadProgress) {
+        if ((downloadProgress > _downloadProgress) || (_downloadStatus == FYFontFileDownloadStateToBeDownloaded)) {
             _downloadProgress = downloadProgress;
         }
     }

@@ -24,17 +24,8 @@
     self = [super init];
     if (self) {
         _task = task;
-        [_task addObserver:self
-                forKeyPath:@"state"
-                   options:NSKeyValueObservingOptionNew
-                   context:NULL];
     }
     return self;
-}
-
-- (void)dealloc
-{
-    [_task removeObserver:self forKeyPath:@"state"];
 }
 
 #pragma mark - NSURLSessionDownloadDelegate
@@ -91,6 +82,13 @@ didCompleteWithError:(NSError *)error {
         if (self.progress) {
             self.progress(self.file);
         };
+        if (self.task.state != NSURLSessionTaskStateCompleted) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[NSNotificationCenter defaultCenter] postNotificationName:FYFontFileDownloadStateDidChangeNotification
+                                                                    object:nil
+                                                                  userInfo:@{FYFontFileNotificationUserInfoKey:self.file}];
+            });
+        }
     }
 }
 

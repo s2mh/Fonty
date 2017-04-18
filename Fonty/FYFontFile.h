@@ -13,7 +13,7 @@
 typedef NS_ENUM(NSUInteger, FYFontFileDownloadState) {
     FYFontFileDownloadStateToBeDownloaded,
     FYFontFileDownloadStateDownloading,
-    FYFontFileDownloadStateSuspending,
+    FYFontFileDownloadStateSuspended,
     FYFontFileDownloadStateDownloaded,
 };
 
@@ -22,7 +22,6 @@ typedef NS_ENUM(NSUInteger, FYFontFileDownloadState) {
 - (instancetype)initWithSourceURLString:(NSString *)sourceURLString;
 
 @property (nonatomic, copy, readonly) NSString *sourceURLString;
-@property (nonatomic, assign) BOOL registered;
 @property (nonatomic, assign, readonly) FYFontFileDownloadState downloadStatus;
 @property (nonatomic, assign, readonly) int64_t fileSize;
 @property (nonatomic, assign, readonly) int64_t fileDownloadedSize;
@@ -33,6 +32,7 @@ typedef NS_ENUM(NSUInteger, FYFontFileDownloadState) {
 
 @property (nonatomic, copy) NSString *localPath;
 @property (nonatomic, copy) NSString *fileName;
+@property (nonatomic, assign) BOOL registered;
 @property (nonatomic, copy) NSArray<FYFontModel *> *fontModels;
 
 - (void)clear;
