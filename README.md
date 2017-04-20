@@ -1,63 +1,73 @@
 # Fonty
 [![Build Status](https://travis-ci.org/s2mh/Fonty.svg?branch=master)](https://travis-ci.org/s2mh/Fonty)
 
-# 使用场景
+# When to use it?
 
-你希望在你的iOS App中使用第三方字体，但是不希望字体文件使安装包的体积增加。
+You want to use thirdparty fonts in your iOS Apps, without putting the font files (each file can be dozens of MB) in bundle directly to expand your app significantly.
 
-# 主要操作
+# What is it used for?
 
-### 1 准备
+It can be used to:
+- dowload and cache font files
+- register and provide the fonts in the files
+- clear cached files and unregister fonts
 
-准备几个可以下载的字体文件地址，例如`https://github.com/s2mh/FontFile/raw/master/Chinese/Simplified%20Chinese/ttc/Xingkai.ttc`。可以是ttf、otf或ttc格式。
+# Demo
 
-### 2 导入
+![](https://raw.githubusercontent.com/s2mh/Fonty/master/Screenshot/Fonty-Demo.gif)
 
-将Fonty库导入到你的工程中。你可以直接手动导入Fonty文件夹，也可以使用CocoaPods：
+# How to use it?
 
+### Prepare URLs
+
+You need to make some downloadable URLs of font files. One way is by uploading your font files to GitHub, then you can get some URLs like:
+*https://github.com/s2mh/FontFile/raw/master/Chinese/Simplified%20Chinese/ttc/Xingkai.ttc*. The format of the font file could be ttf, otf or ttc.
+
+### Install
+
+There are two ways to use Fonty in your project:
+
+- using [CocoaPods](https://cocoapods.org/)
 ```ruby
 target 'TargetName' do
 pod 'Fonty'
 end
 ```
+- by cloning the Fonty directory into your repository
 
-使用时所需的头文件：
+Import the header file `Fonty.h` when you use Fonty.
 
-```objective-c
-#import "Fonty.h"
-```
+### Set URLs
 
-### 3 配置
-
-在AppDelegate中，将准备好的字体文件地址配置给Fonty：
+Tell `FYFontManager`( manages files and fonts) where to download the font files each time your app is launched:
 
 ```objective-c
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 ...
+
 [FYFontManager setFileURLStrings:@[@"https://github.com/s2mh/FontFile/raw/master/Chinese/Simplified%20Chinese/ttc/Xingkai.ttc",
-@"https://github.com/s2mh/FontFile/raw/master/Common/Bold/LiHeiPro.ttf",
+@"https://github.com/s2mh/FontFile/raw/master/Common/Regular/YuppySC-Regular.otf",
 @"https://github.com/s2mh/FontFile/raw/master/English/Bold/Luminari.ttf",
-@"https://github.com/s2mh/FontFile/raw/master/Common/Regular/YuppySC-Regular.otf"]];
+@"https://github.com/s2mh/FontFile/raw/master/Common/Bold/LiHeiPro.ttf"]];
 
 return YES;
 }
 ```
 
-FYFontManager（用于管理字体文件）会据此生成对应的FYFontFile对象（用于描述字体文件信息）：
+It makes `FYFontManager` generate an array of `FYFontFile`(describes a font file) accordingly:
 
 ```objective-c
 NSArray<FYFontFile *> *fontFiles = [FYFontManager fontFiles];
 ```
 
-### 4 下载&注册
+### Download Files & Register Fonts
 
-用FYFontManager的下载字体文件:
+Make `FYFontManager` download a font file:
 
 ```objective-c
 [FYFontManager downloadFontFile:file];
 ```
-
-下载完成后，Fonty会自动保存和注册字体文件。注册成功后，Fonty会发出`FYFontFileRegisteringDidCompleteNotification`通知。该通知包含已注册的文件：
+`FYFontManager` will cache the file and register the fonts in it automatically. When the registering completes, a natification named `FYFontFileRegisteringDidCompleteNotification` will be posted. The file is associated with the notification:
 
 ```objective-c
 - (void)completeFile:(NSNotification *)notification {
@@ -66,18 +76,19 @@ FYFontFile *file = [notification.userInfo objectForKey:FYFontFileNotificationUse
 }
 ```
 
->注意：ttf和otf文件包含一种字体，ttc文件可能包含多个字体。
+>Note：Each ttf or otf file contains only one font, a ttc file contains one or more fonts。
 
-### 5 获得字体
+### Use Fonts
 
-已注册的字体文件包含一个FYFontModel对象数组，一个FYFontModel代表一种字体。可以直接从FYFontModel中获得字体：
+There is an array of `FYFontModel`(represents a registered font) in `FYFontFile`. We can get the font from `FYFontModel` directly:
 
 ```objective-c
 FYFontModel *model = file.fontModels[0];
 UIFont *font = [model.font fontWithSize:17.0];
 ```
 
-也可以设置FYFontManager的mainFont，通过UIFont (FY_Fonty)分类的方法，便捷地获得字体：
+In another way, if we have set the main font of `FYFontManager`, we can use it by a UIFont category method anywhere:
+
 ```objective-c
 [FYFontManager setMainFont:font];
 ...
@@ -85,9 +96,17 @@ UIFont *font = [model.font fontWithSize:17.0];
 textView.font = [UIFont fy_mainFontWithSize:17.0];
 ```
 
-### 6 存档
+### Delete Files & Unregister Fonts
 
-在应用关闭前保存设置的信息，可保证每次应用下次启动后使用同样的字体。
+Use `FYFontManager` to delete font files.  The fonts will be unregistered before the deletion:
+
+```objective-c
+[FYFontManager deleteFontFile:file];
+```
+
+### Archive
+
+To make Fonty remember the settings, archive `FYFontManager ` before your app is terminated:
 
 ```objective-c
 [FYFontManager archive];
