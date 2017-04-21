@@ -25,7 +25,7 @@ There are two ways to call Fonty in your project:
 - using [CocoaPods](https://cocoapods.org/)
 ```ruby
 target 'TargetName' do
-pod 'Fonty'
+pod 'Fonty', '~>2.0.0'
 end
 ```
 - by cloning the Fonty directory into your repository
